@@ -1,0 +1,62 @@
+package com.example.musta.simplyshare.feature.model.mapper;
+
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
+
+import com.example.musta.simplyshare.feature.R;
+import com.example.musta.simplyshare.feature.model.ItemModel;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import data.musta.it.apiit.com.util.Collections;
+import model.musta.it.apiit.com.model.Item;
+
+/**
+ * Created by musta on 23-Dec-17.
+ */
+
+public class ItemModelMapper {
+    private Context context;
+    public ItemModelMapper(Context context){
+        this.context = context;
+    }
+
+    public ItemModel transform(Item item){
+        ItemModel itemModel = null;
+        if(item != null) {
+            Drawable icon = null;
+            switch(item.getType()){
+                case APPLICATION:
+                    try {
+                        icon = context.getPackageManager().getApplicationIcon(item.getId());
+                    } catch (PackageManager.NameNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case VIDEO:
+                case PICTURE:
+                    icon = ContextCompat.getDrawable(context, R.mipmap.ic_launcher);
+                    break;
+                case FILE:
+                    icon = ContextCompat.getDrawable(context, R.mipmap.ic_file);
+                    break;
+                case MUSIC:
+                    icon = ContextCompat.getDrawable(context, R.mipmap.ic_music);
+                    break;
+            }
+            itemModel = new ItemModel(item.getName(), item.getPath(), icon);
+        }
+        return itemModel;
+    }
+
+    public List<ItemModel> transformList(List<Item> items){
+        List<ItemModel> itemModels = new ArrayList<>();
+        if(items != null && !items.isEmpty())
+            itemModels = Collections.convertList(items, this::transform);
+        return itemModels;
+    }
+}
