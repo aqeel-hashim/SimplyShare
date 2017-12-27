@@ -9,7 +9,7 @@ import model.musta.it.apiit.com.repository.ItemRepository;
  * Created by musta on 23-Dec-17.
  */
 
-public class GetItemList extends UseCase<List<Item>, Void> {
+public class GetItemList extends UseCase<List<Item>, Item.Type> {
 
     private final ItemRepository itemRepository;
 
@@ -18,7 +18,7 @@ public class GetItemList extends UseCase<List<Item>, Void> {
     }
 
     @Override
-    protected List<Item> buildUseCase(Void aVoid) {
-        return itemRepository.items();
+    protected List<Item> buildUseCase(Item.Type provider) {
+        return itemRepository.items(provider);
     }
 }

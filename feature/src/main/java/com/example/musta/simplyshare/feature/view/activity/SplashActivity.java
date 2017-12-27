@@ -1,4 +1,4 @@
-package com.example.musta.simplyshare.feature;
+package com.example.musta.simplyshare.feature.view.activity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
+
+import com.example.musta.simplyshare.feature.R;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -24,7 +26,7 @@ public class SplashActivity extends AppCompatActivity {
      * If {@link #AUTO_HIDE} is set, the number of milliseconds to wait after
      * user interaction before hiding the system UI.
      */
-    private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+    private static final int AUTO_HIDE_DELAY_MILLIS = 100;
 
     /**
      * Some older devices needs a small delay between UI widget updates
@@ -94,7 +96,7 @@ public class SplashActivity extends AppCompatActivity {
         mControlsView = findViewById(R.id.fullscreen_content_controls);
         mContentView = findViewById(R.id.fullscreen_content);
 
-
+        hide();
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +113,7 @@ public class SplashActivity extends AppCompatActivity {
             // close this activity
             finish();
         };
-        new Handler().postDelayed(runnable, 500);
+        new Handler().postDelayed(runnable, 5000);
     }
 
     @Override

@@ -5,12 +5,13 @@ import java.util.List;
 import data.musta.it.apiit.com.entity.mapper.ItemEntityMapper;
 import data.musta.it.apiit.com.repository.datasource.ItemDataStoreFactory;
 import model.musta.it.apiit.com.model.Item;
+import model.musta.it.apiit.com.repository.ItemRepository;
 
 /**
  * Created by musta on 23-Dec-17.
  */
 
-public class ItemDataRepository {
+public class ItemDataRepository implements ItemRepository{
     private final ItemDataStoreFactory itemDataStoreFactory;
     private final ItemEntityMapper itemEntityMapper;
 

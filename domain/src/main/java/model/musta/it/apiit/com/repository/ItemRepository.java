@@ -9,5 +9,5 @@ import model.musta.it.apiit.com.model.Item;
  */
 
 public interface ItemRepository {
-    List<Item> items();
+    List<Item> items(Item.Type provider);
 }

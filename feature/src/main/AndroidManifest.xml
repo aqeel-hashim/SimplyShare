@@ -2,8 +2,31 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.musta.simplyshare.feature">
 
-    <application>
-        <activity android:name=".MainActivity">
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:theme="@style/AppTheme">
+        <activity android:name=".view.activity.MainActivity">
             <intent-filter android:order="1">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -17,9 +40,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SplashActivity"
+            android:name=".view.activity.SplashActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_splash"
+            android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">
             <intent-filter android:order="1">
                 <action android:name="android.intent.action.VIEW" />

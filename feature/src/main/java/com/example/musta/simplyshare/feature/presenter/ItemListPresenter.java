@@ -43,13 +43,13 @@ public class ItemListPresenter implements Presenter{
         this.itemListView = null;
     }
 
-    public void initialize(){
-        this.loadTownshipList();
+    public void initialize(Item.Type provider){
+        this.loadTownshipList(provider);
     }
 
-    private void loadTownshipList() {
+    private void loadTownshipList(Item.Type provider) {
         this.showViewLoading();
-        this.getItempList();
+        this.getItemList(provider);
     }
 
     private void showViewLoading() {
@@ -70,7 +70,7 @@ public class ItemListPresenter implements Presenter{
         this.itemListView.renderItemList(townshipModelList);
     }
 
-    private void getItempList() {
-        showItemListInView(this.getItemList.execute(null));
+    private void getItemList(Item.Type provider) {
+        showItemListInView(this.getItemList.execute(provider));
     }
 }
