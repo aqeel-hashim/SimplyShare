@@ -1,5 +1,6 @@
 package data.musta.it.apiit.com.entity;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
 import model.musta.it.apiit.com.model.Item;
@@ -8,7 +9,7 @@ import model.musta.it.apiit.com.model.Item;
  * Created by musta on 23-Dec-17.
  */
 
-public class ItemEntity {
+public class ItemEntity implements Serializable{
     private String id;
     private String name;
     private String size;

@@ -2,15 +2,17 @@ package com.example.musta.simplyshare.feature.model.mapper;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import data.musta.it.apiit.com.util.Collections;
 import model.musta.it.apiit.com.model.Item;
@@ -27,7 +29,9 @@ public class ItemModelMapper {
 
     public ItemModel transform(Item item){
         ItemModel itemModel = null;
+        File file = null;
         if(item != null) {
+            file = new File(item.getPath());
             Drawable icon = null;
             switch(item.getType()){
                 case APPLICATION:
@@ -48,7 +52,7 @@ public class ItemModelMapper {
                     icon = ContextCompat.getDrawable(context, R.mipmap.ic_music);
                     break;
             }
-            itemModel = new ItemModel(item.getName(), item.getPath(), icon);
+            itemModel = new ItemModel(item.getName(), item.getPath(), String.format(Locale.ENGLISH ,"%.2f MB", file.exists() ? file.length()/1024/1024 : 0.0), icon);
         }
         return itemModel;
     }

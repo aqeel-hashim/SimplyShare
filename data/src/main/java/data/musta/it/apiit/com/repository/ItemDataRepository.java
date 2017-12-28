@@ -21,6 +21,6 @@ public class ItemDataRepository implements ItemRepository{
     }
 
     public List<Item> items(Item.Type provider){
-        return itemEntityMapper.transformList(itemDataStoreFactory.create().items(provider));
+        return itemEntityMapper.transformList(itemDataStoreFactory.create(provider).items(provider));
     }
 }
