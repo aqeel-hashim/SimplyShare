@@ -29,6 +29,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
     public void setItemModels(List<ItemModel> itemModels) {
         this.itemModels = itemModels;
+        this.selectedIndexes = new HashMap<>();
         notifyDataSetChanged();
     }
 

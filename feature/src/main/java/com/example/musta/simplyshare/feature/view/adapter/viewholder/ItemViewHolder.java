@@ -32,11 +32,13 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         imageIcon.setImageDrawable(itemModel.getIcon());
         textInfo.setText(itemModel.getSize());
         textName.setText(itemModel.getName());
-        if(selectedIndexes.containsKey(index) && selectedIndexes.get(index)){
-            mainView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_bright));
-        }else{
-            selectedIndexes.put(index, false);
-            mainView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
+        if(selectedIndexes != null ) {
+            if (selectedIndexes.containsKey(index) && selectedIndexes.get(index)) {
+                mainView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_bright));
+            } else {
+                selectedIndexes.put(index, false);
+                mainView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
+            }
         }
         mainView.setOnClickListener(v -> {
             if(selectedIndexes.containsKey(index) && !selectedIndexes.get(index)){

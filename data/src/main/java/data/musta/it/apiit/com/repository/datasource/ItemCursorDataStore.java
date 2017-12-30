@@ -55,21 +55,19 @@ public class ItemCursorDataStore implements ItemDataSource {
                     ext = ext.substring(ext.lastIndexOf(".") + 1).trim();
                     int mask = ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
                     if((packageInfo.flags & mask) == 0) {
-                        ItemEntity appModel = null;
                         try {
-                            File f = new File(packageInfo.dataDir);
-                            FileInputStream fileInputStream = new FileInputStream(f);
-                            appModel = new ItemEntity(packageInfo.packageName, packageInfo.loadLabel(context.getPackageManager()).toString(),
+                            ItemEntity appModel = new ItemEntity(packageInfo.packageName, packageInfo.loadLabel(context.getPackageManager()).toString(),
                                     String.valueOf(size), new Date(context
                                     .getPackageManager()
                                     .getPackageInfo(packageInfo.packageName, 0)
                                     .firstInstallTime).toString(), ext,
-                                    readFile(fileInputStream, (int) f.length()),
-                                    packageInfo.dataDir, Item.Type.APPLICATION);
-                        } catch (PackageManager.NameNotFoundException | FileNotFoundException e) {
+                                    new byte[100],
+                                    packageInfo.publicSourceDir, Item.Type.APPLICATION);
+                            applicationList.add(appModel);
+                        } catch (PackageManager.NameNotFoundException e) {
                             e.printStackTrace();
                         }
-                        applicationList.add(appModel);
+
                     }
                 }
                 applicationList.sort(Comparator.comparing(ItemEntity::getName));
@@ -85,7 +83,7 @@ public class ItemCursorDataStore implements ItemDataSource {
                 String[] selectionArgs = new String[]{mimeTypePDF};
                 Cursor allNonMediaFiles = cr.query(uri, projection, selection, selectionArgs, sortOrder);
                 List<ItemEntity> itemEntities = readCursor(allNonMediaFiles, null, Item.Type.FILE);
-                itemCache.put(Item.Type.APPLICATION, itemEntities);
+                itemCache.put(Item.Type.FILE, itemEntities);
                 return itemEntities;
             case MUSIC:
 
@@ -95,23 +93,22 @@ public class ItemCursorDataStore implements ItemDataSource {
                 if (cursor == null) {
                     return null;
                 }
-                MediaMetadataRetriever mmr;
                 List<ItemEntity> itemEntitiesMusic = readCursor(cursor, MediaStore.Audio.Media.IS_MUSIC, Item.Type.MUSIC);
-                itemCache.put(Item.Type.APPLICATION, itemEntitiesMusic);
+                itemCache.put(Item.Type.MUSIC, itemEntitiesMusic);
                 return itemEntitiesMusic;
             case VIDEO:
                 Cursor cursorVideo = context.getContentResolver().query(
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Video.Media.DEFAULT_SORT_ORDER);
                 List<ItemEntity> itemEntitiesVideo = readCursor(cursorVideo, null, Item.Type.VIDEO);
-                itemCache.put(Item.Type.APPLICATION, itemEntitiesVideo);
+                itemCache.put(Item.Type.VIDEO, itemEntitiesVideo);
                 return itemEntitiesVideo;
             case PICTURE:
                 Cursor cursorPicture = context.getContentResolver().query(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Images.Media.DEFAULT_SORT_ORDER);
                 List<ItemEntity> itemEntitiesPicture = readCursor(cursorPicture, null, Item.Type.PICTURE);
-                itemCache.put(Item.Type.APPLICATION, itemEntitiesPicture);
+                itemCache.put(Item.Type.PICTURE, itemEntitiesPicture);
                 return itemEntitiesPicture;
         }
         return null;
@@ -131,13 +128,13 @@ public class ItemCursorDataStore implements ItemDataSource {
         List<ItemEntity> items = new ArrayList<>();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
-            int isMusic = 1;
+            int isMusic = 0;
             if(check != null && !check.isEmpty()) {
                 isMusic = cursor.getInt(cursor
                         .getColumnIndex(check));
             }
 
-            if (isMusic != 0) {
+            if (isMusic != 0 || check == null) {
                 if (!new File(cursor.getString(cursor
                         .getColumnIndex(MediaStore.Audio.Media.DATA))).exists()) {
                     continue;
@@ -145,28 +142,25 @@ public class ItemCursorDataStore implements ItemDataSource {
                 String ext = cursor.getString(cursor
                         .getColumnIndex(MediaStore.Audio.Media.DATA));
                 ext = ext.substring(ext.lastIndexOf(".") + 1).trim();
-                File f = new File(cursor.getString(cursor
+                ItemEntity itemEntity = new ItemEntity(String.valueOf(cursor.getLong(cursor
+                        .getColumnIndexOrThrow(MediaStore.Audio.Media._ID))),
+                        cursor.getString(cursor
+                                .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
+                        cursor.getString(cursor
+                                .getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)),
+                        cursor.getString(cursor
+                                .getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)),
+                        ext,
+                        new byte[100],
+                        cursor.getString(cursor
+                                .getColumnIndex(MediaStore.Audio.Media.DATA)), type);
+                System.out.println("FIle :" + cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
+                System.out.println("Source dir : " + cursor.getString(cursor
                         .getColumnIndex(MediaStore.Audio.Media.DATA)));
-                FileInputStream fileInputStream = null;
-                try {
-                    fileInputStream = new FileInputStream(f);
-                    byte fileContent[] = readFile(fileInputStream, (int) f.length());
-                    ItemEntity itemEntity = new ItemEntity(String.valueOf(cursor.getLong(cursor
-                            .getColumnIndexOrThrow(MediaStore.Audio.Media._ID))),
-                            cursor.getString(cursor
-                                    .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
-                            cursor.getString(cursor
-                                    .getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)),
-                            cursor.getString(cursor
-                                    .getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)),
-                            ext,
-                            fileContent,
-                            cursor.getString(cursor
-                                    .getColumnIndex(MediaStore.Audio.Media.DATA)), type);
-                    items.add(itemEntity);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                System.out.println("Source size : " + cursor.getString(cursor
+                        .getColumnIndex(MediaStore.Audio.Media.SIZE)));
+                items.add(itemEntity);
 
             }
         }

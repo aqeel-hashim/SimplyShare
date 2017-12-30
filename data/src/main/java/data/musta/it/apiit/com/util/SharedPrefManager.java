@@ -11,16 +11,17 @@ public class SharedPrefManager {
     private SharedPreferences.Editor editor;
     private static SharedPrefManager sharedPrefManager;
 
-    private SharedPrefManager(SharedPreferences sharedPreferences) {
-        sharedPrefManager = new SharedPrefManager(sharedPreferences);
+    public SharedPrefManager(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
         this.editor =sharedPreferences.edit();
     }
 
     public static SharedPrefManager getInstance(SharedPreferences sharedPreferences){
         if(sharedPrefManager != null) return sharedPrefManager;
-        sharedPrefManager = new SharedPrefManager(sharedPreferences);
-        return sharedPrefManager;
+        else {
+            sharedPrefManager = new SharedPrefManager(sharedPreferences);
+            return sharedPrefManager;
+        }
     }
 
     public void put(String key, String value){
@@ -39,6 +40,10 @@ public class SharedPrefManager {
 
     public void setSharedPreferences(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
+    }
+
+    public void clear(){
+        sharedPreferences.edit().clear().apply();
     }
 
     public SharedPreferences.Editor getEditor() {

@@ -19,7 +19,12 @@ import model.musta.it.apiit.com.model.Item;
 public class ItemCacheImpl implements ItemCache {
 
     private Context context;
-    private final String cacheName = ItemCacheImpl.class.getCanonicalName()+":CACHE";
+    public final static String cacheName = ItemCacheImpl.class.getCanonicalName()+":CACHE";
+
+    public ItemCacheImpl(Context context) {
+        this.context = context;
+    }
+
     @Override
     public boolean isCached(Item.Type provider) {
         return !SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get(provider.toString(),"").isEmpty();
@@ -27,7 +32,7 @@ public class ItemCacheImpl implements ItemCache {
 
     @Override
     public boolean isExpired() {
-        return SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get("EXPARATION","").equals("expired");
+        return SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get("EXPIRATION","").equals("expired");
     }
 
     @Override

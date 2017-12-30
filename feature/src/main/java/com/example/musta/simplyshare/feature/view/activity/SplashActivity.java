@@ -1,6 +1,7 @@
 package com.example.musta.simplyshare.feature.view.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,12 +11,27 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.example.musta.simplyshare.feature.R;
+import com.example.musta.simplyshare.feature.model.ItemModel;
+import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
+import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
+import com.example.musta.simplyshare.feature.view.ItemListView;
+
+import java.util.HashMap;
+import java.util.List;
+
+import data.musta.it.apiit.com.cache.ItemCache;
+import data.musta.it.apiit.com.cache.ItemCacheImpl;
+import data.musta.it.apiit.com.entity.mapper.ItemEntityMapper;
+import data.musta.it.apiit.com.repository.ItemDataRepository;
+import data.musta.it.apiit.com.repository.datasource.ItemDataStoreFactory;
+import model.musta.it.apiit.com.interactor.GetItemList;
+import model.musta.it.apiit.com.model.Item;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public class SplashActivity extends AppCompatActivity {
+public class SplashActivity extends AppCompatActivity implements ItemListView{
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -35,6 +51,13 @@ public class SplashActivity extends AppCompatActivity {
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
     private View mContentView;
+    private ItemListPresenter presenter;
+    private GetItemList getItemList;
+    private ItemModelMapper itemModelMapper;
+    private ItemDataRepository itemDataRepository;
+    private ItemEntityMapper itemEntityMapper;
+    private ItemDataStoreFactory itemDataStoreFactory;
+    private ItemCache itemCache;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -108,12 +131,29 @@ public class SplashActivity extends AppCompatActivity {
         Runnable runnable = () -> {
             // This method will be executed once the timer is over
             // Start your app main activity
+            itemModelMapper = new ItemModelMapper(this);
+            itemEntityMapper = new ItemEntityMapper();
+            itemCache = new ItemCacheImpl(this);
+            itemDataStoreFactory = new ItemDataStoreFactory(this, itemCache);
+            itemDataRepository = new ItemDataRepository(itemDataStoreFactory, itemEntityMapper);
+            getItemList = new GetItemList(itemDataRepository);
+            presenter = new ItemListPresenter(getItemList, itemModelMapper);
+            presenter.addItemListViewForType(Item.Type.APPLICATION, this);
+            presenter.addItemListViewForType(Item.Type.MUSIC, this);
+            presenter.addItemListViewForType(Item.Type.FILE, this);
+            presenter.addItemListViewForType(Item.Type.PICTURE, this);
+            presenter.addItemListViewForType(Item.Type.VIDEO, this);
+            presenter.initialize(Item.Type.APPLICATION);
+            presenter.initialize(Item.Type.FILE);
+            presenter.initialize(Item.Type.MUSIC);
+            presenter.initialize(Item.Type.PICTURE);
+            presenter.initialize(Item.Type.VIDEO);
             Intent i = new Intent(SplashActivity.this, MainActivity.class);
             startActivity(i);
             // close this activity
             finish();
         };
-        new Handler().postDelayed(runnable, 5000);
+        new Handler().postDelayed(runnable, 500);
     }
 
     @Override
@@ -167,5 +207,40 @@ public class SplashActivity extends AppCompatActivity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    @Override
+    public void showLoading() {
+
+    }
+
+    @Override
+    public void hideLoading() {
+
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+
+    }
+
+    @Override
+    public Context context() {
+        return null;
+    }
+
+    @Override
+    public void renderItemList(List<ItemModel> itemModels) {
+
+    }
+
+    @Override
+    public void renderSelectedItemList(HashMap<Integer, Boolean> selectedIndexes) {
+
+    }
+
+    @Override
+    public HashMap<Integer, Boolean> saveSelectedIndexes() {
+        return null;
     }
 }

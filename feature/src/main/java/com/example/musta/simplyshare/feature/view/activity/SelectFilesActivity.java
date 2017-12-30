@@ -14,6 +14,7 @@ import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
 import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
 import com.example.musta.simplyshare.feature.view.ItemListView;
+import com.example.musta.simplyshare.feature.view.adapter.SectionPagerAdapter;
 import com.example.musta.simplyshare.feature.view.fragment.ItemFragment;
 
 import java.util.HashMap;
@@ -65,7 +66,7 @@ public class SelectFilesActivity extends BaseActivity{
     public void initComponents() {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.my_tab_layout);
+        TabLayout tabLayout = findViewById(R.id.my_tab_layout);
         final ViewPager viewPager = findViewById(R.id.my_view_pager);
 
         tabLayout.addTab(tabLayout.newTab().setText("Apps"));
@@ -75,15 +76,15 @@ public class SelectFilesActivity extends BaseActivity{
         tabLayout.addTab(tabLayout.newTab().setText("Videos"));
 
         List<ItemFragment> fragments = new Vector<>();
-        fragments.add(ItemFragment.newInstance());
-        fragments.add(ItemFragment.newInstance());
-        fragments.add(ItemFragment.newInstance());
-        fragments.add(ItemFragment.newInstance());
-        fragments.add(ItemFragment.newInstance());
+        fragments.add(ItemFragment.newInstance(Item.Type.APPLICATION));
+        fragments.add(ItemFragment.newInstance(Item.Type.MUSIC));
+        fragments.add(ItemFragment.newInstance(Item.Type.FILE));
+        fragments.add(ItemFragment.newInstance(Item.Type.PICTURE));
+        fragments.add(ItemFragment.newInstance(Item.Type.VIDEO));
 
         itemModelMapper = new ItemModelMapper(this);
         itemEntityMapper = new ItemEntityMapper();
-        itemCache = new ItemCacheImpl();
+        itemCache = new ItemCacheImpl(this);
         itemDataStoreFactory = new ItemDataStoreFactory(this, itemCache);
         itemDataRepository = new ItemDataRepository(itemDataStoreFactory, itemEntityMapper);
         getItemList = new GetItemList(itemDataRepository);
@@ -95,40 +96,16 @@ public class SelectFilesActivity extends BaseActivity{
         presenter.addItemListViewForType(Item.Type.PICTURE, fragments.get(3));
         presenter.addItemListViewForType(Item.Type.VIDEO, fragments.get(4));
 
-        presenter.initialize(Item.Type.APPLICATION);
-        presenter.initialize(Item.Type.MUSIC);
-        presenter.initialize(Item.Type.FILE);
-        presenter.initialize(Item.Type.PICTURE);
-        presenter.initialize(Item.Type.VIDEO);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        presenter.resume(Item.Type.APPLICATION);
-        presenter.resume(Item.Type.MUSIC);
-        presenter.resume(Item.Type.FILE);
-        presenter.resume(Item.Type.PICTURE);
-        presenter.resume(Item.Type.VIDEO);
-    }
+        fragments.get(0).setPresenter(presenter);
+        fragments.get(1).setPresenter(presenter);
+        fragments.get(2).setPresenter(presenter);
+        fragments.get(3).setPresenter(presenter);
+        fragments.get(4).setPresenter(presenter);
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        presenter.pause(Item.Type.APPLICATION);
-        presenter.pause(Item.Type.MUSIC);
-        presenter.pause(Item.Type.FILE);
-        presenter.pause(Item.Type.PICTURE);
-        presenter.pause(Item.Type.VIDEO);
-    }
+        final SectionPagerAdapter adapter = new SectionPagerAdapter(getSupportFragmentManager(), fragments);
+        viewPager.setAdapter(adapter);
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        presenter.destroy(Item.Type.APPLICATION);
-        presenter.destroy(Item.Type.MUSIC);
-        presenter.destroy(Item.Type.FILE);
-        presenter.destroy(Item.Type.PICTURE);
-        presenter.destroy(Item.Type.VIDEO);
+        tabLayout.setupWithViewPager(viewPager);
     }
 }

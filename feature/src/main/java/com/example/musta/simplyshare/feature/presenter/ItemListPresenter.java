@@ -33,11 +33,12 @@ public class ItemListPresenter implements ItemPresenter {
 
     public void addItemListViewForType(Item.Type type, ItemListView itemListView){
         itemListViewHashMap.put(type, itemListView);
+        selectedIndexesByType.put(type, new HashMap<>());
     }
 
     @Override
     public void resume(Item.Type provider) {
-        selectedIndexesByType.put(provider, itemListViewHashMap.get(provider).saveSelectedIndexes());
+        selectedIndexesByType.put(provider, new HashMap<>());
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ItemListPresenter implements ItemPresenter {
 
     @Override
     public void destroy(Item.Type provider) {
-        selectedIndexesByType.put(provider, itemListViewHashMap.get(provider).saveSelectedIndexes());
+        selectedIndexesByType.put(provider, new HashMap<>());
         this.itemListViewHashMap = null;
     }
 

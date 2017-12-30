@@ -18,7 +18,7 @@ public class ItemDataStoreFactory {
     }
 
     public ItemDataSource create(Item.Type provder){
-        if(itemCache.isExpired() && itemCache.isCached(provder))
+        if(!itemCache.isExpired() && itemCache.isCached(provder))
             return new ItemLocalDataStore(itemCache);
         else
             return new ItemCursorDataStore(context, itemCache);

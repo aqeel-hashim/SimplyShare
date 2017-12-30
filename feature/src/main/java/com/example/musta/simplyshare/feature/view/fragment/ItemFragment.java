@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
+import com.example.musta.simplyshare.feature.presenter.ItemPresenter;
 import com.example.musta.simplyshare.feature.view.ItemListView;
 import com.example.musta.simplyshare.feature.view.adapter.ItemAdapter;
 
@@ -30,9 +31,12 @@ import model.musta.it.apiit.com.model.Item;
 public class ItemFragment extends Fragment implements ItemListView{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private final static String ARG_TYPE = "ARGTYPE";
 
     private ItemAdapter adapter;
     private RecyclerView recyclerView;
+    private ItemListPresenter presenter;
+    private Item.Type type;
 
     public ItemFragment() {
         // Required empty public constructor
@@ -44,8 +48,11 @@ public class ItemFragment extends Fragment implements ItemListView{
      * @return A new instance of fragment ItemFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ItemFragment newInstance() {
+    public static ItemFragment newInstance(Item.Type type) {
         ItemFragment fragment = new ItemFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(ARG_TYPE, type.toString());
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -53,6 +60,25 @@ public class ItemFragment extends Fragment implements ItemListView{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if(getArguments() != null){
+            switch(getArguments().getString(ARG_TYPE)){
+                case "APPLICATION":
+                    type = Item.Type.APPLICATION;
+                    break;
+                case "FILE":
+                    type = Item.Type.FILE;
+                    break;
+                case "MUSIC":
+                    type = Item.Type.MUSIC;
+                    break;
+                case "PICTURE":
+                    type = Item.Type.PICTURE;
+                    break;
+                case "VIDEO":
+                    type = Item.Type.VIDEO;
+                    break;
+            }
+        }
     }
 
     @Override
@@ -65,7 +91,31 @@ public class ItemFragment extends Fragment implements ItemListView{
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
         adapter = new ItemAdapter(new ArrayList<>(), new HashMap<>(),getContext());
+        recyclerView.setAdapter(adapter);
+        presenter.initialize(type);
         return view;
+    }
+
+    public void setPresenter(ItemListPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.resume(type);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.pause(type);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.destroy(type);
     }
 
     @Override
