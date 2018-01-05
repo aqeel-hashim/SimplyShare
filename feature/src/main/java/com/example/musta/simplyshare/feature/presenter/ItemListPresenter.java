@@ -6,6 +6,7 @@ import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
 import com.example.musta.simplyshare.feature.view.ItemListView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,6 +55,10 @@ public class ItemListPresenter implements ItemPresenter {
 
     public void initialize(Item.Type provider){
         this.loadTownshipList(provider);
+    }
+
+    public ArrayList<ItemModel> getSelectedItems(Item.Type provider){
+        return itemListViewHashMap.get(provider).getSelectedItems();
     }
 
     private void loadTownshipList(Item.Type provider) {

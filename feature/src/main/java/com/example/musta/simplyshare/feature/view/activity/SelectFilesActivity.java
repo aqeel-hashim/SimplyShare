@@ -1,8 +1,12 @@
 package com.example.musta.simplyshare.feature.view.activity;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -10,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
@@ -18,7 +23,9 @@ import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
 import com.example.musta.simplyshare.feature.view.ItemListView;
 import com.example.musta.simplyshare.feature.view.adapter.SectionPagerAdapter;
 import com.example.musta.simplyshare.feature.view.fragment.ItemFragment;
+import com.example.musta.simplyshare.feature.view.fragment.SendFragment;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
@@ -61,15 +68,20 @@ public class SelectFilesActivity extends BaseActivity{
 
     @Override
     public Toolbar getToolbar() {
-        return findViewById(R.id.mainToolbar);
+        Toolbar toolbar = findViewById(R.id.mainToolbar);
+        toolbar.setTitleTextColor(getResources().getColor(android.R.color.white, null));
+        return toolbar;
     }
 
     @Override
     public void initComponents() {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+
         TabLayout tabLayout = findViewById(R.id.my_tab_layout);
         final ViewPager viewPager = findViewById(R.id.my_view_pager);
+
 
         tabLayout.addTab(tabLayout.newTab().setText("Apps"));
         tabLayout.addTab(tabLayout.newTab().setText("Music"));
@@ -120,5 +132,39 @@ public class SelectFilesActivity extends BaseActivity{
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void send(View view) {
+        ArrayList<ItemModel> itemModels = new ArrayList<>();
+        if(presenter.getSelectedItems(Item.Type.APPLICATION) != null
+                && !presenter.getSelectedItems(Item.Type.APPLICATION).isEmpty())
+            itemModels.addAll(presenter.getSelectedItems(Item.Type.APPLICATION));
+
+        if(presenter.getSelectedItems(Item.Type.FILE) != null
+                && !presenter.getSelectedItems(Item.Type.FILE).isEmpty())
+            itemModels.addAll(presenter.getSelectedItems(Item.Type.FILE));
+
+        if(presenter.getSelectedItems(Item.Type.MUSIC) != null
+                && !presenter.getSelectedItems(Item.Type.MUSIC).isEmpty())
+            itemModels.addAll(presenter.getSelectedItems(Item.Type.MUSIC));
+
+        if(presenter.getSelectedItems(Item.Type.VIDEO) != null
+                && !presenter.getSelectedItems(Item.Type.VIDEO).isEmpty())
+            itemModels.addAll(presenter.getSelectedItems(Item.Type.VIDEO));
+
+        if(presenter.getSelectedItems(Item.Type.PICTURE) != null
+                && !presenter.getSelectedItems(Item.Type.PICTURE).isEmpty())
+            itemModels.addAll(presenter.getSelectedItems(Item.Type.PICTURE));
+
+        SendFragment fragment = SendFragment.newInstance(itemModels);
+        findViewById(R.id.container).setVisibility(View.VISIBLE);
+        FragmentManager fm = getSupportFragmentManager();
+        fm.beginTransaction().replace(R.id.container,fragment, "SendFragment").addToBackStack(null).commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        findViewById(R.id.container).setVisibility(View.VISIBLE);
     }
 }

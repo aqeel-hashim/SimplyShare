@@ -52,7 +52,7 @@ public class ItemModelMapper {
                     icon = ContextCompat.getDrawable(context, R.mipmap.ic_music);
                     break;
             }
-            itemModel = new ItemModel(item.getName() != null ? item.getName().length() > 54 ? item.getName().substring(0,50) + " ...": item.getName() : item.getId(), item.getPath(), file.length() > 1048576 ? String.format(Locale.ENGLISH ,"%.2f MB", file.exists() ? ((double) file.length() )/1024.0f/1024.0f : 0.0) : String.format(Locale.ENGLISH ,"%.2f KB", file.exists() ? ((double) file.length() )/1024.0f : 0.0), icon);
+            itemModel = new ItemModel(item.getName() != null ? item.getName().length() > 54 ? item.getName().substring(0,50) + " ...": item.getName() : file.getName(), item.getPath(), file.length() > 1048576 ? String.format(Locale.ENGLISH ,"%.2f MB", file.exists() ? ((double) file.length() )/1024.0f/1024.0f : 0.0) : String.format(Locale.ENGLISH ,"%.2f KB", file.exists() ? ((double) file.length() )/1024.0f : 0.0), icon);
         }
         return itemModel;
     }

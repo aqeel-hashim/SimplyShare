@@ -9,6 +9,7 @@ import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.view.adapter.viewholder.ItemViewHolder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,6 +50,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemViewHolder> {
 
     public HashMap<Integer, Boolean> getSelectedIndexes() {
         return selectedIndexes;
+    }
+
+    public ArrayList<ItemModel> getSelectedItems(){
+        ArrayList<ItemModel> itemModels = new ArrayList<>();
+        for(int i : selectedIndexes.keySet()){
+            itemModels.add(this.itemModels.get(i));
+        }
+        return itemModels;
     }
 
     @Override

@@ -152,4 +152,9 @@ public class ItemFragment extends Fragment implements ItemListView{
     public HashMap<Integer, Boolean> saveSelectedIndexes() {
         return adapter.getSelectedIndexes();
     }
+
+    @Override
+    public ArrayList<ItemModel> getSelectedItems() {
+        return adapter != null ? adapter.getSelectedItems() : new ArrayList<>();
+    }
 }

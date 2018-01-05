@@ -16,6 +16,7 @@ import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
 import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
 import com.example.musta.simplyshare.feature.view.ItemListView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -240,6 +241,11 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
 
     @Override
     public HashMap<Integer, Boolean> saveSelectedIndexes() {
+        return null;
+    }
+
+    @Override
+    public ArrayList<ItemModel> getSelectedItems() {
         return null;
     }
 }
