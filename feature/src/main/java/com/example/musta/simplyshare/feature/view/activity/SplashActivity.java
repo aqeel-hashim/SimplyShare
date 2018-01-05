@@ -180,7 +180,6 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
         if (actionBar != null) {
             actionBar.hide();
         }
-        mControlsView.setVisibility(View.GONE);
         mVisible = false;
 
         // Schedule a runnable to remove the status and navigation bar after a delay

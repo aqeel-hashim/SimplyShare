@@ -11,10 +11,11 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/mainToolbar"
-        android:title="SimplyShare"
+        android:title="@string/select_files"
         android:background="@color/colorPrimary"
         android:titleTextColor="@android:color/white"
         android:layout_width="match_parent"
+
         android:layout_alignParentTop="true"
         android:layout_height="wrap_content"/>
 

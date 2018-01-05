@@ -56,7 +56,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.activity.SelectFilesActivity">
+        <activity android:name=".view.activity.SelectFilesActivity"
+            android:parentActivityName=".view.activity.MainActivity">
             <intent-filter android:order="1">
                 <action android:name="android.intent.action.VIEW"/>
 
