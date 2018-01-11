@@ -3,7 +3,7 @@ package data.musta.it.apiit.com.repository;
 import java.util.List;
 
 import data.musta.it.apiit.com.entity.mapper.ItemEntityMapper;
-import data.musta.it.apiit.com.repository.datasource.ItemDataStoreFactory;
+import data.musta.it.apiit.com.repository.datasource.item.ItemDataStoreFactory;
 import model.musta.it.apiit.com.model.Item;
 import model.musta.it.apiit.com.repository.ItemRepository;
 

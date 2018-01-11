@@ -1,7 +1,5 @@
 package com.example.musta.simplyshare.feature.presenter;
 
-import android.util.SparseBooleanArray;
-
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
 import com.example.musta.simplyshare.feature.view.ItemListView;
@@ -17,7 +15,7 @@ import model.musta.it.apiit.com.model.Item;
  * Created by musta on 27-Dec-17.
  */
 
-public class ItemListPresenter implements ItemPresenter {
+public class ItemListPresenter implements Presenter {
 
     private final GetItemList getItemList;
     private final ItemModelMapper itemModelMapper;
@@ -54,14 +52,14 @@ public class ItemListPresenter implements ItemPresenter {
     }
 
     public void initialize(Item.Type provider){
-        this.loadTownshipList(provider);
+        this.loadItemList(provider);
     }
 
     public ArrayList<ItemModel> getSelectedItems(Item.Type provider){
         return itemListViewHashMap.get(provider).getSelectedItems();
     }
 
-    private void loadTownshipList(Item.Type provider) {
+    private void loadItemList(Item.Type provider) {
         this.showViewLoading(provider);
         this.getItemList(provider);
     }

@@ -24,7 +24,7 @@ import data.musta.it.apiit.com.cache.ItemCache;
 import data.musta.it.apiit.com.cache.ItemCacheImpl;
 import data.musta.it.apiit.com.entity.mapper.ItemEntityMapper;
 import data.musta.it.apiit.com.repository.ItemDataRepository;
-import data.musta.it.apiit.com.repository.datasource.ItemDataStoreFactory;
+import data.musta.it.apiit.com.repository.datasource.item.ItemDataStoreFactory;
 import model.musta.it.apiit.com.interactor.GetItemList;
 import model.musta.it.apiit.com.model.Item;
 

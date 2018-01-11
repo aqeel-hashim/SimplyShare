@@ -9,5 +9,7 @@ import model.musta.it.apiit.com.model.Device;
  */
 
 public interface DeviceRepository {
+    void start(DevicesDiscovered devicesDiscovered);
     List<Device> devices();
+    WifiBroadcastReceiver create();
 }

@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
-import com.example.musta.simplyshare.feature.presenter.ItemPresenter;
 import com.example.musta.simplyshare.feature.view.ItemListView;
 import com.example.musta.simplyshare.feature.view.adapter.ItemAdapter;
 

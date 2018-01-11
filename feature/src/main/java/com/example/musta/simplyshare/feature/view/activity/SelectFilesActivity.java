@@ -1,17 +1,9 @@
 package com.example.musta.simplyshare.feature.view.activity;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.support.design.widget.TabLayout;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,13 +12,11 @@ import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
 import com.example.musta.simplyshare.feature.presenter.ItemListPresenter;
-import com.example.musta.simplyshare.feature.view.ItemListView;
 import com.example.musta.simplyshare.feature.view.adapter.SectionPagerAdapter;
 import com.example.musta.simplyshare.feature.view.fragment.ItemFragment;
 import com.example.musta.simplyshare.feature.view.fragment.SendFragment;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
@@ -34,7 +24,7 @@ import data.musta.it.apiit.com.cache.ItemCache;
 import data.musta.it.apiit.com.cache.ItemCacheImpl;
 import data.musta.it.apiit.com.entity.mapper.ItemEntityMapper;
 import data.musta.it.apiit.com.repository.ItemDataRepository;
-import data.musta.it.apiit.com.repository.datasource.ItemDataStoreFactory;
+import data.musta.it.apiit.com.repository.datasource.item.ItemDataStoreFactory;
 import model.musta.it.apiit.com.interactor.GetItemList;
 import model.musta.it.apiit.com.model.Item;
 
