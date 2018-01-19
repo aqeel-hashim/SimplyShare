@@ -1,5 +1,6 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/content"
@@ -18,13 +19,33 @@
         android:textSize="25sp"
         android:textColor="@android:color/white"/>
 
-    <com.example.musta.simplyshare.feature.view.fragment.RadarView
+    <RelativeLayout
         android:id="@+id/radarView"
         android:layout_width="500dp"
         android:layout_height="500dp"
         android:layout_gravity="center"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="20dp"
-        />
+        android:layout_centerInParent="true">
+        <com.guo.duoduo.randomtextview.RandomTextView
+            android:id="@+id/random_textview"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_centerInParent="true"/>
+
+        <com.guo.duoduo.library.RadarScanView
+            android:layout_width="match_parent"
+            app:circleColor="@android:color/white"
+            app:tailColor="@android:color/white"
+            app:radarColor="@android:color/white"
+            android:layout_height="match_parent"/>
+    </RelativeLayout>
+
+    <!--<com.example.musta.simplyshare.feature.view.fragment.RadarView-->
+        <!--android:id="@+id/radarView"-->
+        <!--android:layout_width="500dp"-->
+        <!--android:layout_height="500dp"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--/>-->
 
 </RelativeLayout>

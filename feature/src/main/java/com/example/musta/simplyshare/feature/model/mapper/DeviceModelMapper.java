@@ -15,7 +15,7 @@ import model.musta.it.apiit.com.model.Device;
 public class DeviceModelMapper {
 
     public DeviceModel transform(Device device){
-        return new DeviceModel(device.getIpAddress()+"\\"+device.getMacAddress(), device.getName());
+        return new DeviceModel(device.getIpAddress()+" @ "+device.getMacAddress(), device.getName());
     }
 
     public List<DeviceModel> transformList(List<Device> devices){

@@ -17,6 +17,10 @@ public class DeviceEntityMapper {
 
     }
 
+    public static Device transformFromWifiP2P(WifiP2pDevice device){
+        return new Device("", device.deviceName, device.deviceAddress);
+    }
+
     public Device transform(DeviceEntity wifidevice){
         Device device = null;
         if(wifidevice != null){

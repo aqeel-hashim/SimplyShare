@@ -42,6 +42,8 @@ public class RadarView extends View {
     public RadarView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
+        setWillNotDraw(false);
+
         Paint localPaint = new Paint();
         localPaint.setColor(Color.WHITE);
         localPaint.setAntiAlias(true);
@@ -85,6 +87,7 @@ public class RadarView extends View {
         Random rand = new Random(64838);
         Point point = new Point(rand.nextInt(getWidth()), rand.nextInt(getHeight()));
         currentCanvas.drawCircle(point.x, point.y, 10, latestPaint[0]);
+        invalidate();
     }
 
     @Override

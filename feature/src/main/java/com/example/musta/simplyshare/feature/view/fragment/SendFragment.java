@@ -1,60 +1,48 @@
 package com.example.musta.simplyshare.feature.view.fragment;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.net.wifi.p2p.WifiP2pManager;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.example.musta.simplyshare.feature.R;
-import com.example.musta.simplyshare.feature.model.DeviceModel;
 import com.example.musta.simplyshare.feature.model.ItemModel;
-import com.example.musta.simplyshare.feature.model.mapper.DeviceModelMapper;
-import com.example.musta.simplyshare.feature.presenter.DeviceListPresenter;
-import com.example.musta.simplyshare.feature.view.DeviceListView;
+import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
+import com.guo.duoduo.randomtextview.RandomTextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import data.musta.it.apiit.com.entity.mapper.DeviceEntityMapper;
-import data.musta.it.apiit.com.repository.DeviceDataRepository;
-import data.musta.it.apiit.com.repository.datasource.device.DeviceWifiP2PRetriever;
-import data.musta.it.apiit.com.repository.datasource.device.WifiActivity;
-import model.musta.it.apiit.com.interactor.GetDeviceList;
-import model.musta.it.apiit.com.repository.DevicesDiscovered;
+import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
+import model.musta.it.apiit.com.interactor.ConnectionListner;
+import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
+import model.musta.it.apiit.com.model.Device;
+import model.musta.it.apiit.com.model.WifiP2pInfo;
+import model.musta.it.apiit.com.repository.DeviceManager;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link SendFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class SendFragment extends Fragment implements DeviceListView, WifiActivity, WifiP2pManager.ChannelListener{
+public class SendFragment extends Fragment implements ConnectionListner, OnPeersChangedListner, WifiP2PEnbleListner{
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_ITEM_LIST = "itemModelList";
+    private static final String TAG = SendFragment.class.getSimpleName();
 
     // TODO: Rename and change types of parameters
     private List<ItemModel> itemModels;
-    private RadarView mRadarView = null;
+    private boolean wifienabled;
 
-    private DeviceListPresenter presenter;
-    private GetDeviceList getDeviceList;
-    private DeviceModelMapper deviceModelMapper;
-    private DeviceDataRepository deviceDataRepository;
-    private DeviceEntityMapper deviceEntityMapper;
-    private DeviceWifiP2PRetriever deviceWifiP2PRetriever;
-    private WifiP2pManager manager;
-    private WifiP2pManager.Channel channel;
-
-    private boolean isWifiP2pEnabled = false;
-    private BroadcastReceiver receiver;
-    private final IntentFilter intentFilter = new IntentFilter();
+    private DeviceViewPresenter presenter;
+    private DeviceManager deviceManager;
 
     public SendFragment() {
         // Required empty public constructor
@@ -89,25 +77,17 @@ public class SendFragment extends Fragment implements DeviceListView, WifiActivi
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send, container, false);
-        mRadarView = view.findViewById(R.id.radarView);
-        mRadarView.setShowCircles(true);
-        mRadarView.startAnimation();
 
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        final RandomTextView randomTextView = (RandomTextView) view.findViewById(
+                R.id.random_textview);
 
-        deviceModelMapper = new DeviceModelMapper();
-        deviceEntityMapper = new DeviceEntityMapper();
-        deviceWifiP2PRetriever = new DeviceWifiP2PRetriever(this);
-        manager = (WifiP2pManager) getContext().getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = manager.initialize(getContext(), getContext().getMainLooper(), this);
-        deviceDataRepository = new DeviceDataRepository(deviceWifiP2PRetriever, deviceEntityMapper, manager, channel, this);
-        getDeviceList = new GetDeviceList(deviceDataRepository);
-        presenter = new DeviceListPresenter(getDeviceList,deviceModelMapper,this);
+        randomTextView.addKeyWord("Test");
+        randomTextView.addKeyWord("Test 2");
+        randomTextView.show();
+
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
+        presenter = new DeviceViewPresenter(deviceManager);
         presenter.initialize();
-
         return inflater.inflate(R.layout.fragment_send, container, false);
     }
 
@@ -115,14 +95,13 @@ public class SendFragment extends Fragment implements DeviceListView, WifiActivi
     @Override
     public void onResume() {
         super.onResume();
-        receiver = (BroadcastReceiver) getDeviceList.create();
-        getContext().registerReceiver(receiver, intentFilter);
+        presenter.resume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getContext().unregisterReceiver(receiver);
+        presenter.pause();
     }
 
     @Override
@@ -136,53 +115,28 @@ public class SendFragment extends Fragment implements DeviceListView, WifiActivi
     }
 
     @Override
-    public void update() {
-        presenter.update();
+    public void enable(boolean enable) {
+        this.wifienabled = enable;
+        Log.d(TAG, "enable: "+enable);
     }
 
     @Override
-    public void showLoading() {
-        Toast.makeText(getContext(), "Start getting devices", Toast.LENGTH_SHORT).show();
+    public void updateDeviceList(List<Device> devices) {
+        Log.d(TAG, "updateDeviceList: size: "+devices.size()+"\nfirst: "+devices.get(0).toString());
     }
 
     @Override
-    public void hideLoading() {
-        Toast.makeText(getContext(), "Finish gettings devices", Toast.LENGTH_SHORT).show();
+    public void connected(WifiP2pInfo info) {
+        Log.d(TAG, "connected: "+info.groupOwnerAddress);
     }
 
     @Override
-    public void showError(String errorMessage) {
-        Log.d(TAG, "showError: "+errorMessage);
-        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show();
+    public void disconnected() {
+        Log.d(TAG, "disconnected: ");
     }
 
     @Override
-    public Context context() {
-        return getContext();
-    }
-
-    @Override
-    public void renderDeviceList(List<DeviceModel> deviceModels) {
-        Log.d(TAG, "renderDeviceList: "+deviceModels.size()+" first: "+deviceModels.get(0).getName());
-    }
-
-    @Override
-    public DeviceModel getSelectedDevice() {
-        return null;
-    }
-
-    @Override
-    public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled) {
-        this.isWifiP2pEnabled = isWifiP2pEnabled;
-    }
-
-    @Override
-    public void resetData() {
-
-    }
-
-    @Override
-    public void onChannelDisconnected() {
-
+    public void updateCurrentDevice(Device device) {
+        Log.d(TAG, "updateCurrentDevice: "+device.toString());
     }
 }
