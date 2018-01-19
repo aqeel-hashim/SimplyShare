@@ -37,8 +37,8 @@ public class RandomTextView extends FrameLayout
 
     private Random random;
     private Vector<String> vecKeywords;
-    private int width;
-    private int height;
+    private int width = 400;
+    private int height = 400;
     private int mode = RippleView.MODE_OUT;
     private int fontColor = 0xff0000ff;
     private int shadowColor = 0xdd696969;

@@ -81,8 +81,11 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
         final RandomTextView randomTextView = (RandomTextView) view.findViewById(
                 R.id.random_textview);
 
-        randomTextView.addKeyWord("Test");
-        randomTextView.addKeyWord("Test 2");
+        new Handler().postDelayed(() -> {
+            randomTextView.addKeyWord("Test");
+            randomTextView.addKeyWord("Test 2");
+            randomTextView.show();
+        }, 2000);
         randomTextView.show();
 
         deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
