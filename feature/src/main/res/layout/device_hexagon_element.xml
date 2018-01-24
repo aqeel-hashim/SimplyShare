@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.abed.hexagonrecyclerview.view.VerticallyAdaptableHexagonImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/img_view"
+    android:layout_width="10dp"
+    android:layout_height="10dp"
+    />

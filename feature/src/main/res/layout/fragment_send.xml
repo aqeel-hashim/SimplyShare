@@ -12,14 +12,14 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/radarView"
+        android:layout_above="@+id/rvItems"
         android:text="Waiting for receivers..."
         android:layout_centerHorizontal="true"
         android:textAlignment="center"
         android:textSize="25sp"
         android:textColor="@android:color/white"/>
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:id="@+id/radarView"
         android:layout_width="500dp"
         android:layout_height="500dp"
@@ -37,7 +37,18 @@
             app:tailColor="@android:color/white"
             app:radarColor="@android:color/white"
             android:layout_height="match_parent"/>
-    </RelativeLayout>
+    </RelativeLayout>-->
+
+    <com.abed.hexagonrecyclerview.view.HexagonRecyclerView
+        android:id="@+id/rvItems"
+        android:layout_width="500dp"
+        android:layout_height="500dp"
+        android:layout_gravity="center"
+        android:layout_centerInParent="true"
+        app:items_count_in_row="10"
+        app:items_horizontal_spacing="50dp"
+        app:items_vertical_spacing="50dp"
+        app:orientation="horizontal" />
 
     <!--<com.example.musta.simplyshare.feature.view.fragment.RadarView-->
         <!--android:id="@+id/radarView"-->

@@ -38,6 +38,8 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.skyfishjy.ripplebackground:library:1.0.1'
     compile 'it.smasini:android-radar:1.0'
+    compile 'com.mindvalley.android:hexagonrecyclerview:1.0.1'
+    compile 'com.squareup.picasso:picasso:2.5.2'
     implementation project(':data')
     implementation project(':domain')
     implementation project(':library')

@@ -10,12 +10,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.abed.hexagonrecyclerview.view.HexagonRecyclerView;
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
+import com.example.musta.simplyshare.feature.view.adapter.RadarDeviceAdapter;
+import com.example.musta.simplyshare.feature.view.adapter.viewholder.RadarDeviceViewholder;
 import com.guo.duoduo.randomtextview.RandomTextView;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
@@ -43,6 +47,10 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
 
     private DeviceViewPresenter presenter;
     private DeviceManager deviceManager;
+
+    private LinkedList<String> images;
+    private RadarDeviceAdapter imagesAdapter;
+    private HexagonRecyclerView recyclerView;
 
     public SendFragment() {
         // Required empty public constructor
@@ -78,7 +86,7 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_send, container, false);
 
-        final RandomTextView randomTextView = (RandomTextView) view.findViewById(
+        /*final RandomTextView randomTextView = (RandomTextView) view.findViewById(
                 R.id.random_textview);
 
         new Handler().postDelayed(() -> {
@@ -86,7 +94,68 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
             randomTextView.addKeyWord("Test 2");
             randomTextView.show();
         }, 2000);
-        randomTextView.show();
+        randomTextView.show();*/
+
+
+
+        imagesAdapter = new RadarDeviceAdapter(new LinkedList<String>());
+        recyclerView = (HexagonRecyclerView) view.findViewById(R.id.rvItems);
+
+        images = new LinkedList<>();
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2592.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31910.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/32128.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31923.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2574.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24131.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23690.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/69316.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23760.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/37918.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24346.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2580.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2592.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31910.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/32128.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31923.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2574.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24131.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23690.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/69316.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23760.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/37918.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24346.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2580.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2592.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31910.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/32128.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31923.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2574.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24131.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23690.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/69316.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23760.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/37918.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24346.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2580.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2592.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31910.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/32128.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/31923.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2574.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24131.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23690.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/69316.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/23760.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/37918.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/24346.jpg");
+        images.add("https://s3.amazonaws.com/99Covers-Facebook-Covers/watermark/2580.jpg");
+
+        imagesAdapter.updateList(images);
+        recyclerView.setAdapter(imagesAdapter);
+
+
+
 
         deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
         presenter = new DeviceViewPresenter(deviceManager);
