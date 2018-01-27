@@ -39,16 +39,12 @@
             android:layout_height="match_parent"/>
     </RelativeLayout>-->
 
-    <com.abed.hexagonrecyclerview.view.HexagonRecyclerView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/rvItems"
         android:layout_width="500dp"
         android:layout_height="500dp"
         android:layout_gravity="center"
-        android:layout_centerInParent="true"
-        app:items_count_in_row="10"
-        app:items_horizontal_spacing="50dp"
-        app:items_vertical_spacing="50dp"
-        app:orientation="horizontal" />
+        android:layout_centerInParent="true" />
 
     <!--<com.example.musta.simplyshare.feature.view.fragment.RadarView-->
         <!--android:id="@+id/radarView"-->

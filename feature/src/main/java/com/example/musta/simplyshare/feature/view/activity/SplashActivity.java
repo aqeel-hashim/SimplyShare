@@ -1,8 +1,12 @@
 package com.example.musta.simplyshare.feature.view.activity;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -109,6 +113,7 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
             return false;
         }
     };
+    private int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,9 +134,31 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
             }
         });
 
-        Runnable runnable = () -> {
-            // This method will be executed once the timer is over
-            // Start your app main activity
+        // This method will be executed once the timer is over
+// Start your app main activity
+        Runnable runnable = this::checkPermissions;
+        new Handler().postDelayed(runnable, 500);
+    }
+
+
+    public void checkPermissions() {
+        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            System.out.println("PERMISSION GRANTED");
+            // Should we show an explanation?
+//            if (shouldShowRequestPermissionRationale(
+//                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                // Explain to the user why we need to read the contacts
+//            }
+
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                    MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
+
+            // MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE is an
+            // app-defined int constant that should be quite unique
+        } else {
+            System.out.println("PERMISSION ALREADY EXISTS");
             itemModelMapper = new ItemModelMapper(this);
             itemEntityMapper = new ItemEntityMapper();
             itemCache = new ItemCacheImpl(this);
@@ -153,9 +180,9 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
             startActivity(i);
             // close this activity
             finish();
-        };
-        new Handler().postDelayed(runnable, 500);
+        }
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -247,5 +274,31 @@ public class SplashActivity extends AppCompatActivity implements ItemListView{
     @Override
     public ArrayList<ItemModel> getSelectedItems() {
         return null;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        System.out.println("PERMISSION ALREADY EXISTS");
+        itemModelMapper = new ItemModelMapper(this);
+        itemEntityMapper = new ItemEntityMapper();
+        itemCache = new ItemCacheImpl(this);
+        itemDataStoreFactory = new ItemDataStoreFactory(this, itemCache);
+        itemDataRepository = new ItemDataRepository(itemDataStoreFactory, itemEntityMapper);
+        getItemList = new GetItemList(itemDataRepository);
+        presenter = new ItemListPresenter(getItemList, itemModelMapper);
+        presenter.addItemListViewForType(Item.Type.APPLICATION, this);
+        presenter.addItemListViewForType(Item.Type.MUSIC, this);
+        presenter.addItemListViewForType(Item.Type.FILE, this);
+        presenter.addItemListViewForType(Item.Type.PICTURE, this);
+        presenter.addItemListViewForType(Item.Type.VIDEO, this);
+        presenter.initialize(Item.Type.APPLICATION);
+        presenter.initialize(Item.Type.FILE);
+        presenter.initialize(Item.Type.MUSIC);
+        presenter.initialize(Item.Type.PICTURE);
+        presenter.initialize(Item.Type.VIDEO);
+        Intent i = new Intent(SplashActivity.this, MainActivity.class);
+        startActivity(i);
+        // close this activity
+        finish();
     }
 }

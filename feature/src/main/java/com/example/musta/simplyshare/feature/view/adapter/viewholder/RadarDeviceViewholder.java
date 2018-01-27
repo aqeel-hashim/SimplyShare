@@ -1,10 +1,14 @@
 package com.example.musta.simplyshare.feature.view.adapter.viewholder;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-import com.abed.hexagonrecyclerview.view.HexagonImageView;
 import com.example.musta.simplyshare.feature.R;
+import com.example.musta.simplyshare.feature.model.DeviceModel;
+import com.example.musta.simplyshare.feature.view.adapter.RadarDeviceAdapter;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -13,17 +17,32 @@ import com.squareup.picasso.Picasso;
 
 public class RadarDeviceViewholder extends RecyclerView.ViewHolder {
 
-    HexagonImageView imageView;
-    String image_url;
+    private ImageView imageView;
+    private int image_url;
+    private TextView name;
+    private View mainView;
+    private DeviceConnectClickListner listner;
+    private static final String TAG = RadarDeviceAdapter.class.getSimpleName();
 
-    public RadarDeviceViewholder(View itemView) {
+    public RadarDeviceViewholder(View itemView, DeviceConnectClickListner listner) {
         super(itemView);
-        imageView = (HexagonImageView) itemView.findViewById(R.id.img_view);
+        mainView = itemView;
+        imageView = (ImageView) itemView.findViewById(R.id.img_view);
+        name = (TextView) itemView.findViewById(R.id.deviceName);
+        this.listner = listner;
     }
 
-    public void setImageUrl(String imageUrl){
-        this.image_url = imageUrl;
+    public void setImageUrl(DeviceModel deviceModel){
+        this.image_url = deviceModel.getImage();
         Picasso.with(imageView.getContext()).load(image_url).into(imageView);
-        Picasso.with(imageView.getContext()).load(image_url).into(imageView);
+        name.setText(deviceModel.getName());
+        mainView.setOnClickListener(v -> {
+            Log.d(TAG, "setImageUrl: CLICKED ---> "+deviceModel.getName());
+            listner.connect(deviceModel);
+        });
+    }
+
+    public interface DeviceConnectClickListner{
+        void connect(DeviceModel device);
     }
 }

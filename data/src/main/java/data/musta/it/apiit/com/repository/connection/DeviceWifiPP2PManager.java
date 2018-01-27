@@ -55,12 +55,12 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         manager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-                Log.d(TAG, "onSuccess: ");
+                Log.d(TAG, "onSuccess: Discover");
             }
 
             @Override
             public void onFailure(int reason) {
-                Log.d(TAG, "onFailure: ");
+                Log.d(TAG, "onFailure: Discover reason: "+reason);
             }
         });
     }
@@ -82,13 +82,15 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
 
     @Override
     public void connect(Device device) {
-        boolean found = false;
-        for(Device deviceInner : devices){
-            if(!device.getMacAddress().equals(deviceInner.getMacAddress())) continue;
-            found = true;
-        }
+//        boolean found = false;
+//        for(Device deviceInner : devices){
+//            if(!device.getMacAddress().equals(deviceInner.getMacAddress())) continue;
+//            found = true;
+//        }
+//
+//        if(!found) return;
 
-        if(!found) return;
+        Log.d(TAG, "connect: Name ---> "+device.getName()+"\nMAC ---> "+device.getMacAddress());
 
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.getMacAddress();
@@ -97,12 +99,12 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         manager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Log.d(TAG, "onSuccess: connect");
             }
 
             @Override
             public void onFailure(int reason) {
-
+                Log.d(TAG, "onFailure: connect reason: "+reason);
             }
         });
     }

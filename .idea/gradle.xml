@@ -14,7 +14,10 @@
             <option value="$PROJECT_DIR$/domain" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/instantapp" />
+            <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/model" />
+            <option value="$PROJECT_DIR$/randomtextview" />
+            <option value="$PROJECT_DIR$/rippleview" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

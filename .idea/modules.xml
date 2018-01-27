@@ -9,8 +9,10 @@
       <module fileurl="file://$PROJECT_DIR$/domain/domain.iml" filepath="$PROJECT_DIR$/domain/domain.iml" />
       <module fileurl="file://$PROJECT_DIR$/feature/feature.iml" filepath="$PROJECT_DIR$/feature/feature.iml" />
       <module fileurl="file://$PROJECT_DIR$/instantapp/instantapp.iml" filepath="$PROJECT_DIR$/instantapp/instantapp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/model/model.iml" filepath="$PROJECT_DIR$/model/model.iml" />
-      <module fileurl="file://C:\Users\musta\AndroidStudioProjects\Final\SimplyShare\domain\model.iml" filepath="C:\Users\musta\AndroidStudioProjects\Final\SimplyShare\domain\model.iml" />
+      <module fileurl="file://$PROJECT_DIR$/randomtextview/randomtextview.iml" filepath="$PROJECT_DIR$/randomtextview/randomtextview.iml" />
+      <module fileurl="file://$PROJECT_DIR$/rippleview/rippleview.iml" filepath="$PROJECT_DIR$/rippleview/rippleview.iml" />
     </modules>
   </component>
 </project>
