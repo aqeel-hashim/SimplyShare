@@ -146,10 +146,12 @@ public class SelectFilesActivity extends BaseActivity{
                 && !presenter.getSelectedItems(Item.Type.PICTURE).isEmpty())
             itemModels.addAll(presenter.getSelectedItems(Item.Type.PICTURE));
 
-        SendFragment fragment = SendFragment.newInstance(itemModels);
-        findViewById(R.id.container).setVisibility(View.VISIBLE);
-        FragmentManager fm = getSupportFragmentManager();
-        fm.beginTransaction().replace(R.id.container,fragment, "SendFragment").addToBackStack(null).commit();
+        if (!itemModels.isEmpty()) {
+            SendFragment fragment = SendFragment.newInstance(itemModels);
+            findViewById(R.id.container).setVisibility(View.VISIBLE);
+            FragmentManager fm = getSupportFragmentManager();
+            fm.beginTransaction().replace(R.id.container, fragment, "SendFragment").addToBackStack(null).commit();
+        }
     }
 
     @Override

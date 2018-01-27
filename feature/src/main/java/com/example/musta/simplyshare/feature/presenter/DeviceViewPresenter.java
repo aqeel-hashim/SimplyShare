@@ -41,7 +41,7 @@ public class DeviceViewPresenter{
     }
 
     public void connectionHandshake(WifiP2pInfo info) {
-
+        deviceManager.sendConnectionMessage(info);
     }
 
 }

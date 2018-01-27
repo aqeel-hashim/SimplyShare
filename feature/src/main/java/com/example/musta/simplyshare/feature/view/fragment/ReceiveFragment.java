@@ -8,14 +8,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.musta.simplyshare.feature.R;
+import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
 import com.skyfishjy.library.RippleBackground;
+
+import java.util.List;
+
+import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
+import model.musta.it.apiit.com.interactor.ConnectionListner;
+import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
+import model.musta.it.apiit.com.model.Device;
+import model.musta.it.apiit.com.model.WifiP2pInfo;
+import model.musta.it.apiit.com.repository.DeviceManager;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link ReceiveFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ReceiveFragment extends Fragment {
+public class ReceiveFragment extends Fragment implements ConnectionListner, OnPeersChangedListner, WifiP2PEnbleListner {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -25,7 +36,8 @@ public class ReceiveFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-
+    private DeviceViewPresenter presenter;
+    private DeviceManager deviceManager;
     public ReceiveFragment() {
         // Required empty public constructor
     }
@@ -62,10 +74,56 @@ public class ReceiveFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_receive, container, false);
-        final RippleBackground rippleBackground= (RippleBackground) view.findViewById(R.id.content);
+        final RippleBackground rippleBackground = view.findViewById(R.id.content);
         rippleBackground.startRippleAnimation();
         //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
+        presenter = new DeviceViewPresenter(deviceManager);
+        presenter.initialize();
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.resume();
+        ((DeviceWifiPP2PManager) deviceManager).addOnPeersChangedListner(this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.pause();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
+    }
+
+    @Override
+    public void enable(boolean enable) {
+
+    }
+
+    @Override
+    public void updateDeviceList(List<Device> devices) {
+
+    }
+
+    @Override
+    public void connected(WifiP2pInfo info) {
+        deviceManager.sendConnectionMessage(info);
+    }
+
+    @Override
+    public void disconnected() {
+
+    }
+
+    @Override
+    public void updateCurrentDevice(Device device) {
+
+    }
 }

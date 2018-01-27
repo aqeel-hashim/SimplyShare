@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -164,7 +163,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
     }
 
     @Override
-    public void update(WifiP2pDevice entity) {
+    public void update(data.musta.it.apiit.com.entity.WifiP2pDevice entity) {
         String ip = getIPAddress(true);
         currentDevice = new DeviceEntity(ip, entity);
     }

@@ -18,7 +18,7 @@ public class ItemEntity implements Serializable{
     private byte[] data;
     private String path;
     private Item.Type type;
-
+    private boolean endTransfer = false;
     public ItemEntity(String id, String name, String size,
                       String date, String ext, byte[] data,
                       String path, Item.Type type) {
@@ -106,33 +106,43 @@ public class ItemEntity implements Serializable{
         this.type = type;
     }
 
+    public boolean isEndTransfer() {
+        return endTransfer;
+    }
+
+    public void setEndTransfer(boolean endTransfer) {
+        this.endTransfer = endTransfer;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ItemEntity)) return false;
 
         ItemEntity that = (ItemEntity) o;
 
-        if (!getId().equals(that.getId())) return false;
-        if (!getName().equals(that.getName())) return false;
-        if (!getSize().equals(that.getSize())) return false;
-        if (!getDate().equals(that.getDate())) return false;
-        if (!getExt().equals(that.getExt())) return false;
-        if (!Arrays.equals(getData(), that.getData())) return false;
-        if (!getPath().equals(that.getPath())) return false;
-        return getType() == that.getType();
+        if (endTransfer != that.endTransfer) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (size != null ? !size.equals(that.size) : that.size != null) return false;
+        if (date != null ? !date.equals(that.date) : that.date != null) return false;
+        if (ext != null ? !ext.equals(that.ext) : that.ext != null) return false;
+        if (!Arrays.equals(data, that.data)) return false;
+        if (path != null ? !path.equals(that.path) : that.path != null) return false;
+        return type == that.type;
     }
 
     @Override
     public int hashCode() {
-        int result = getId().hashCode();
-        result = 31 * result + getName().hashCode();
-        result = 31 * result + getSize().hashCode();
-        result = 31 * result + getDate().hashCode();
-        result = 31 * result + getExt().hashCode();
-        result = 31 * result + Arrays.hashCode(getData());
-        result = 31 * result + getPath().hashCode();
-        result = 31 * result + getType().hashCode();
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + (date != null ? date.hashCode() : 0);
+        result = 31 * result + (ext != null ? ext.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(data);
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        result = 31 * result + (endTransfer ? 1 : 0);
         return result;
     }
 
@@ -147,11 +157,12 @@ public class ItemEntity implements Serializable{
                 ", data=" + Arrays.toString(data) +
                 ", path='" + path + '\'' +
                 ", type=" + type +
+                ", endTransfer=" + endTransfer +
                 '}';
     }
 
     @Override
-    protected ItemEntity clone() throws CloneNotSupportedException {
-        return this;
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

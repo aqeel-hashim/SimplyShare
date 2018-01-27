@@ -80,7 +80,7 @@ public class ItemCursorDataStore implements ItemDataSource {
                 String mimeTypePDF = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
                 String[] selectionArgs = new String[]{mimeTypePDF};
                 Cursor allNonMediaFiles = cr.query(uri, projection, selection, selectionArgs, sortOrder);
-                List<ItemEntity> itemEntities = readCursor(allNonMediaFiles, null, Item.Type.FILE);
+                List<ItemEntity> itemEntities = readCursor(allNonMediaFiles, null, Item.Type.FILE, MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.SIZE, MediaStore.Files.FileColumns.DATE_ADDED);
                 itemCache.put(Item.Type.FILE, itemEntities);
                 return itemEntities;
             case MUSIC:
@@ -91,21 +91,21 @@ public class ItemCursorDataStore implements ItemDataSource {
                 if (cursor == null) {
                     return null;
                 }
-                List<ItemEntity> itemEntitiesMusic = readCursor(cursor, MediaStore.Audio.Media.IS_MUSIC, Item.Type.MUSIC);
+                List<ItemEntity> itemEntitiesMusic = readCursor(cursor, MediaStore.Audio.Media.IS_MUSIC, Item.Type.MUSIC, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.DATE_ADDED);
                 itemCache.put(Item.Type.MUSIC, itemEntitiesMusic);
                 return itemEntitiesMusic;
             case VIDEO:
                 Cursor cursorVideo = context.getContentResolver().query(
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Video.Media.DEFAULT_SORT_ORDER);
-                List<ItemEntity> itemEntitiesVideo = readCursor(cursorVideo, null, Item.Type.VIDEO);
+                List<ItemEntity> itemEntitiesVideo = readCursor(cursorVideo, null, Item.Type.VIDEO, MediaStore.Video.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DATE_ADDED);
                 itemCache.put(Item.Type.VIDEO, itemEntitiesVideo);
                 return itemEntitiesVideo;
             case PICTURE:
                 Cursor cursorPicture = context.getContentResolver().query(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-                List<ItemEntity> itemEntitiesPicture = readCursor(cursorPicture, null, Item.Type.PICTURE);
+                List<ItemEntity> itemEntitiesPicture = readCursor(cursorPicture, null, Item.Type.PICTURE, MediaStore.Images.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED);
                 itemCache.put(Item.Type.PICTURE, itemEntitiesPicture);
                 return itemEntitiesPicture;
         }
@@ -122,7 +122,7 @@ public class ItemCursorDataStore implements ItemDataSource {
         return fileContent;
     }
 
-    public List<ItemEntity> readCursor(Cursor cursor, String check, Item.Type type){
+    public List<ItemEntity> readCursor(Cursor cursor, String check, Item.Type type, String data, String name, String size, String datea_added) {
         List<ItemEntity> items = new ArrayList<>();
         for (int i = 0; i < cursor.getCount(); i++) {
             cursor.moveToNext();
@@ -134,30 +134,33 @@ public class ItemCursorDataStore implements ItemDataSource {
 
             if (isMusic != 0 || check == null) {
                 if (!new File(cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Audio.Media.DATA))).exists()) {
+                        .getColumnIndex(data))).exists()) {
                     continue;
                 }
                 String ext = cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Audio.Media.DATA));
+                        .getColumnIndex(data));
                 ext = ext.substring(ext.lastIndexOf(".") + 1).trim();
                 ItemEntity itemEntity = new ItemEntity(String.valueOf(cursor.getLong(cursor
-                        .getColumnIndexOrThrow(MediaStore.Audio.Media._ID))),
+                        .getColumnIndexOrThrow(MediaStore.Audio.Media._ID))), type == Item.Type.FILE ?
                         cursor.getString(cursor
-                                .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)),
+                                .getColumnIndex(name)) : cursor.getString(cursor
+                        .getColumnIndex(data)).split("/")[cursor.getString(cursor
+                        .getColumnIndex(data)).split("/").length - 1],
                         cursor.getString(cursor
-                                .getColumnIndexOrThrow(MediaStore.Audio.Media.SIZE)),
+                                .getColumnIndexOrThrow(size)),
                         cursor.getString(cursor
-                                .getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_ADDED)),
+                                .getColumnIndexOrThrow(datea_added)),
                         ext,
                         new byte[100],
                         cursor.getString(cursor
-                                .getColumnIndex(MediaStore.Audio.Media.DATA)), type);
+                                .getColumnIndex(data)), type);
                 System.out.println("FIle :" + cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)));
+                        .getColumnIndex(data)).split("/")[cursor.getString(cursor
+                        .getColumnIndex(data)).split("/").length - 1]);
                 System.out.println("Source dir : " + cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Audio.Media.DATA)));
+                        .getColumnIndex(data)));
                 System.out.println("Source size : " + cursor.getString(cursor
-                        .getColumnIndex(MediaStore.Audio.Media.SIZE)));
+                        .getColumnIndex(size)));
                 items.add(itemEntity);
 
             }

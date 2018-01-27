@@ -150,6 +150,11 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     @Override
     public void connected(WifiP2pInfo info) {
         Log.d(TAG, "connected: "+info.groupOwnerAddress);
+        presenter.connectionHandshake(info);
+        ProgressFragment fragment = ProgressFragment.newInstance(new ArrayList<>(itemModels));
+        getActivity().findViewById(R.id.container).setVisibility(View.VISIBLE);
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        fm.beginTransaction().replace(R.id.container, fragment, "SendFragment").addToBackStack(null).commit();
     }
 
     @Override
@@ -167,9 +172,5 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     public void connect(DeviceModel device) {
         Log.d(TAG, "connect: CLICK PASSED ---> "+device.getName());
         presenter.connect(device);
-        ProgressFragment fragment = ProgressFragment.newInstance(new ArrayList<>(itemModels));
-        getActivity().findViewById(R.id.container).setVisibility(View.VISIBLE);
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        fm.beginTransaction().replace(R.id.container, fragment, "SendFragment").addToBackStack(null).commit();
     }
 }

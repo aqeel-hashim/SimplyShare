@@ -20,7 +20,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
-import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.util.Log;
@@ -149,14 +148,14 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 listner.updateCurrentDevice(DeviceEntityMapper.transformFromWifiP2P(intent.getParcelableExtra(
                     WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)));
 
-            updateListner.update(intent.getParcelableExtra(
-                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
+            updateListner.update(new data.musta.it.apiit.com.entity.WifiP2pDevice().Clone(intent.getParcelableExtra(
+                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)));
 
 
         }
     }
 
     public interface CurrentDeviceUpdateListner {
-        void update(WifiP2pDevice entity);
+        void update(data.musta.it.apiit.com.entity.WifiP2pDevice entity);
     }
 }

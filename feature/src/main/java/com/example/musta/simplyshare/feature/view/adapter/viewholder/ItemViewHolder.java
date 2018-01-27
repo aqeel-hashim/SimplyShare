@@ -2,6 +2,7 @@ package com.example.musta.simplyshare.feature.view.adapter.viewholder;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,6 +33,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         imageIcon.setImageDrawable(itemModel.getIcon());
         textInfo.setText(itemModel.getSize());
         textName.setText(itemModel.getName());
+        Log.d(ItemViewHolder.class.getSimpleName(), "bindSelection: " + itemModel.getName());
         if(selectedIndexes != null ) {
             if (selectedIndexes.containsKey(index) && selectedIndexes.get(index)) {
                 mainView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_bright));

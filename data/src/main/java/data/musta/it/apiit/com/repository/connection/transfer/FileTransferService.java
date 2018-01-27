@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
@@ -36,11 +37,12 @@ public class FileTransferService extends IntentService {
     Handler mHandler;
 
     public static final int SOCKET_TIMEOUT = 5000;
-    public static final String ACTION_SEND_FILE = "com.example.android.wifidirect.SEND_FILE";
+    public static final String ACTION_SEND_FILE = "data.musta.it.apiit.com.SimplyShare.SEND_FILE";
     public static final String EXTRAS_FILE_PATH = "file_url";
     public static final String EXTRAS_ITEM_ENTITY = "file_url";
     public static final String EXTRAS_GROUP_OWNER_ADDRESS = "go_host";
     public static final String EXTRAS_GROUP_OWNER_PORT = "go_port";
+    public static final String EXTRAS_FILE_TRANSFER_LISTNER = "FILETRANSFERLISTNER";
 
     public static int PORT = 8888;
     public static final String inetaddress = "inetaddress";
@@ -80,6 +82,7 @@ public class FileTransferService extends IntentService {
             Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
             TransferEntity item = (TransferEntity) intent.getExtras().getSerializable(EXTRAS_ITEM_ENTITY);
+            listner = (FileProgressListner) intent.getExtras().getSerializable(EXTRAS_FILE_TRANSFER_LISTNER);
 
             try {
                 Log.d(TAG, "Opening client socket - ");
@@ -230,7 +233,7 @@ public class FileTransferService extends IntentService {
     }
 
     public static boolean copyRecievedFile(InputStream inputStream,
-                                           OutputStream out, Long length) {
+                                           OutputStream out, Long length, FileProgressListner listner) {
 
         byte buf[] = new byte[FileTransferService.ByteSize];
         byte Decryptedbuf[] = new byte[FileTransferService.ByteSize];
@@ -269,9 +272,11 @@ public class FileTransferService extends IntentService {
         return true;
     }
 
-    public interface FileProgressListner {
+    public interface FileProgressListner extends Serializable {
         void update(int progress);
 
         void end();
+
+        void finish();
     }
 }

@@ -36,8 +36,9 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
     private int PORT;
     private FileTransferService.FileProgressListner listner;
     private String WiFiClientIp;
-    public static String FolderName = "WiFiDirectDemo";
+    public static String FolderName = "SimplyShare";
     private static final String TAG = FileServerAsyncTask.class.getSimpleName();
+
     private Context context;
 
     /**
@@ -140,7 +141,11 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
 
                 FileTransferService.copyRecievedFile(inputstream, new FileOutputStream(f),
-                        ReceivedFileLength);
+                        ReceivedFileLength, listner);
+
+                if (obj.getItemEntity().isEndTransfer())
+                    listner.finish();
+
                 ois.close(); // close the ObjectOutputStream object after saving
                 // file to storage.
                 serverSocket.close();
