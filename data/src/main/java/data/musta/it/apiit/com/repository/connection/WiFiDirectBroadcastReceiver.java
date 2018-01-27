@@ -44,26 +44,38 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private Channel channel;
     private WifiP2PEnbleListner wifiP2PEnbleListner;
     private List<OnPeersChangedListner> onPeersChangedListners;
-    private ConnectionListner connectionListner;
+    private List<ConnectionListner> listners;
+    private CurrentDeviceUpdateListner updateListner;
     private static final String TAG = WiFiDirectBroadcastReceiver.class.getSimpleName();
     /**
      * @param manager WifiP2pManager system service
      * @param channel Wifi p2p channel
      * @param wifiP2PEnbleListner
      * @param connectionListner
+     * @param updateListner
      */
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, CurrentDeviceUpdateListner updateListner) {
         super();
         this.manager = manager;
         this.channel = channel;
         this.wifiP2PEnbleListner = wifiP2PEnbleListner;
-        this.connectionListner = connectionListner;
+        this.updateListner = updateListner;
+        this.listners = new ArrayList<>();
+        this.listners.add(connectionListner);
         this.onPeersChangedListners = new ArrayList<>();
     }
 
     public void addOnPeersChangedListner(OnPeersChangedListner onPeersChangedListner){ this.onPeersChangedListners.add(onPeersChangedListner); }
 
     public void removeOnPeersChangedListner(OnPeersChangedListner onPeersChangedListner){ this.onPeersChangedListners.remove(onPeersChangedListner); }
+
+    public void addConnectionListner(ConnectionListner listner) {
+        this.listners.add(listner);
+    }
+
+    public void removeConnectionLister(ConnectionListner listner) {
+        this.listners.remove(listner);
+    }
 
     /*
      * (non-Javadoc)
@@ -112,7 +124,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 return;
             }
 
-            NetworkInfo networkInfo = (NetworkInfo) intent
+            NetworkInfo networkInfo = intent
                     .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo.isConnected()) {
@@ -121,19 +133,30 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 // info to find group owner IP
 
                 manager.requestConnectionInfo(channel, info -> {
-                    connectionListner.connected(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));
+                    for (ConnectionListner listner : this.listners)
+                        listner.connected(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));
                 });
             } else {
                 // It's a disconnect
                 //activity.resetData();
-                connectionListner.disconnected();
+                for (ConnectionListner listner : this.listners) listner.disconnected();
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
 //            deviceWifiP2PRetriever.updateThisDevice((WifiP2pDevice) intent.getParcelableExtra(
 //                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
-            connectionListner.updateCurrentDevice(DeviceEntityMapper.transformFromWifiP2P((WifiP2pDevice) intent.getParcelableExtra(
+
+            for (ConnectionListner listner : this.listners)
+                listner.updateCurrentDevice(DeviceEntityMapper.transformFromWifiP2P(intent.getParcelableExtra(
                     WifiP2pManager.EXTRA_WIFI_P2P_DEVICE)));
 
+            updateListner.update(intent.getParcelableExtra(
+                    WifiP2pManager.EXTRA_WIFI_P2P_DEVICE));
+
+
         }
+    }
+
+    public interface CurrentDeviceUpdateListner {
+        void update(WifiP2pDevice entity);
     }
 }

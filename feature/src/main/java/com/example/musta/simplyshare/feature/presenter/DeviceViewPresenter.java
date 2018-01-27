@@ -3,6 +3,7 @@ package com.example.musta.simplyshare.feature.presenter;
 import com.example.musta.simplyshare.feature.model.DeviceModel;
 
 import model.musta.it.apiit.com.model.Device;
+import model.musta.it.apiit.com.model.WifiP2pInfo;
 import model.musta.it.apiit.com.repository.DeviceManager;
 
 /**
@@ -37,6 +38,10 @@ public class DeviceViewPresenter{
     public void connect(DeviceModel deviceModel){
         Device device = new Device(deviceModel.getId().split("@")[0].trim(), deviceModel.getName(), deviceModel.getId().split("@")[1].trim());
         deviceManager.connect(device);
+    }
+
+    public void connectionHandshake(WifiP2pInfo info) {
+
     }
 
 }

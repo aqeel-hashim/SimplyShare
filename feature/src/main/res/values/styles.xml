@@ -24,4 +24,9 @@
         <item name="android:background">@color/black_overlay</item>
     </style>
 
+    <style name="CustomProgressBarHorizontal" parent="android:Widget.DeviceDefault.Light.ProgressBar.Horizontal">
+        <item name="android:minHeight">100dip</item>
+        <item name="android:maxHeight">100dip</item>
+    </style>
+
 </resources>

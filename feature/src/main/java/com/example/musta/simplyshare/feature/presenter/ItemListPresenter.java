@@ -37,7 +37,7 @@ public class ItemListPresenter implements Presenter {
 
     @Override
     public void resume(Item.Type provider) {
-        selectedIndexesByType.put(provider, new HashMap<>());
+        this.itemListViewHashMap.get(provider).renderSelectedItemList(selectedIndexesByType.get(provider) != null && selectedIndexesByType.get(provider).size() > 0 ? selectedIndexesByType.get(provider) : new HashMap<>());
     }
 
     @Override

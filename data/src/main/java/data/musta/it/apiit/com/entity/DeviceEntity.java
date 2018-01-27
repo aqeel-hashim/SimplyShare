@@ -2,11 +2,13 @@ package data.musta.it.apiit.com.entity;
 
 import android.net.wifi.p2p.WifiP2pDevice;
 
+import java.io.Serializable;
+
 /**
  * Created by musta on 05-Jan-18.
  */
 
-public class DeviceEntity {
+public class DeviceEntity implements Serializable {
     private String ipAddress;
     private WifiP2pDevice device;
 

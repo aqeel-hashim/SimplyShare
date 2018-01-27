@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">data</string>
+
+    <string name="pref_WiFiClientIp">WiFiClientIp</string>
+    <string name="pref_GroupOwnerAddress">GroupOwnerAddress</string>
+    <string name="pref_ServerBoolean">ServerBoolean</string>
 </resources>
