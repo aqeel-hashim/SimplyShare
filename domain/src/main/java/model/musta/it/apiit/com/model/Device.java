@@ -1,10 +1,12 @@
 package model.musta.it.apiit.com.model;
 
+import java.io.Serializable;
+
 /**
  * Created by musta on 05-Jan-18.
  */
 
-public class Device {
+public class Device implements Serializable {
     private String ipAddress;
     private String name;
     private String macAddress;

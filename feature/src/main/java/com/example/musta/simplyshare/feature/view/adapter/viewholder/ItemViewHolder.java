@@ -43,14 +43,16 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
             }
         }
         mainView.setOnClickListener(v -> {
-            if(selectedIndexes.containsKey(index) && !selectedIndexes.get(index)){
-                mainView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_bright));
-                adapter.notifyItemChanged(index);
-                selectedIndexes.put(index, true);
-            }else{
-                mainView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
-                adapter.notifyItemChanged(index);
-                selectedIndexes.put(index, false);
+            if (selectedIndexes != null) {
+                if (selectedIndexes.containsKey(index) && !selectedIndexes.get(index)) {
+                    mainView.setBackgroundColor(context.getResources().getColor(android.R.color.holo_blue_bright));
+                    adapter.notifyItemChanged(index);
+                    selectedIndexes.put(index, true);
+                } else {
+                    mainView.setBackgroundColor(context.getResources().getColor(android.R.color.white));
+                    adapter.notifyItemChanged(index);
+                    selectedIndexes.put(index, false);
+                }
             }
         });
     }

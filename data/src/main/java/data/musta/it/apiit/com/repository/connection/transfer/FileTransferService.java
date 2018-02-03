@@ -19,12 +19,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
 import data.musta.it.apiit.com.BuildConfig;
 import data.musta.it.apiit.com.entity.TransferEntity;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 
 /**
  * A service that process each file transfer request i.e Intent by opening a
@@ -51,7 +51,7 @@ public class FileTransferService extends IntentService {
     public static final String Filelength = "filelength";
     private static final String TAG = FileTransferService.class.getSimpleName();
 
-    public static FileProgressListner listner;
+    public static TransferProgressListener listner;
 
     public FileTransferService(String name) {
         super(name);
@@ -77,12 +77,11 @@ public class FileTransferService extends IntentService {
 
         Context context = getApplicationContext();
         if (intent.getAction().equals(ACTION_SEND_FILE)) {
-            String fileUri = intent.getExtras().getString(EXTRAS_FILE_PATH);
             String host = intent.getExtras().getString(EXTRAS_GROUP_OWNER_ADDRESS);
             Socket socket = new Socket();
             int port = intent.getExtras().getInt(EXTRAS_GROUP_OWNER_PORT);
+            int actualFileLength = intent.getExtras().getInt(Filelength);
             TransferEntity item = (TransferEntity) intent.getExtras().getSerializable(EXTRAS_ITEM_ENTITY);
-            listner = (FileProgressListner) intent.getExtras().getSerializable(EXTRAS_FILE_TRANSFER_LISTNER);
 
             try {
                 Log.d(TAG, "Opening client socket - ");
@@ -93,34 +92,38 @@ public class FileTransferService extends IntentService {
                 OutputStream stream = socket.getOutputStream();
                 ContentResolver cr = context.getContentResolver();
                 InputStream is = null;
-                
-                /*
+
+                /**
                  * Object that is used to send file name with extension and recieved on other side.
-                 */
+                 * */
+
+
                 ObjectOutputStream oos = new ObjectOutputStream(stream);
 
                 oos.writeObject(item);
 
                 try {
-                    is = cr.openInputStream(Uri.parse(fileUri));
+                    is = cr.openInputStream(Uri.fromFile(new File(item.getItemEntity().getPath())));
                 } catch (FileNotFoundException e) {
                     Log.d(TAG, e.toString());
                 }
-                copyFile(is, stream);
+                copyFile(actualFileLength, is, stream);
                 Log.d(TAG, "Client: Data written");
                 oos.close();    //close the ObjectOutputStream after sending data.
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 e.printStackTrace();
                 Log.e(TAG, "onHandleIntent: " + "Unable to connect host" + "service socket error in wififiletransferservice class");
-                mHandler.post(new Runnable() {
-
-                    public void run() {
-                        // TODO Auto-generated method stub
-                        Toast.makeText(FileTransferService.this, "Paired Device is not Ready to receive the file", Toast.LENGTH_LONG).show();
-                    }
+                mHandler.post(() -> {
+                    // TODO Auto-generated method stub
+                    Toast.makeText(FileTransferService.this, "Paired Device is not Ready to receive the file", Toast.LENGTH_LONG).show();
                 });
-                listner.end();
+//                listner.endProgress();
+                Intent intentResponse = new Intent();
+                intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+                intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+                sendBroadcast(intentResponse);
+
             } finally {
                 if (socket != null) {
                     if (socket.isConnected()) {
@@ -197,9 +200,9 @@ public class FileTransferService extends IntentService {
     }
 
 
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
+    private boolean copyFile(int ActualFilelength, InputStream inputStream, OutputStream out) {
         long total = 0;
-        long test = 0;
+        int Percentage = 0;
         byte buf[] = new byte[FileTransferService.ByteSize];
         if (buf == null) return false;
 
@@ -212,17 +215,32 @@ public class FileTransferService extends IntentService {
                     if (ActualFilelength > 0) {
                         Percentage = (int) ((total * 100) / ActualFilelength);
                     }
-                    listner.update(Percentage);
+                    Intent intentResponse = new Intent();
+                    intentResponse.setAction(FileTransferBroadcastReceiver.UPDATE_TRANSFER
+                    );
+                    intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+                    intentResponse.putExtra(FileTransferBroadcastReceiver.PROGRESS, Percentage);
+                    sendBroadcast(intentResponse);
+                    //listner.updateProgress(Percentage);
                 } catch (Exception e) {
                     // TODO: handle exception
                     e.printStackTrace();
                     Percentage = 0;
                     ActualFilelength = 0;
+
+                    Intent intentResponse = new Intent();
+                    intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+                    intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+                    sendBroadcast(intentResponse);
+//                    listner.endProgress();
                 }
             }
 
-            listner.end();
-
+            //listner.endProgress();
+            Intent intentResponse = new Intent();
+            intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+            intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+            sendBroadcast(intentResponse);
             out.close();
             inputStream.close();
         } catch (IOException e) {
@@ -233,7 +251,7 @@ public class FileTransferService extends IntentService {
     }
 
     public static boolean copyRecievedFile(InputStream inputStream,
-                                           OutputStream out, Long length, FileProgressListner listner) {
+                                           OutputStream out, Long length, TransferProgressListener listner) {
 
         byte buf[] = new byte[FileTransferService.ByteSize];
         byte Decryptedbuf[] = new byte[FileTransferService.ByteSize];
@@ -254,15 +272,15 @@ public class FileTransferService extends IntentService {
                     if (length > 0) {
                         progresspercentage = (int) ((total * 100) / length);
                     }
-                    listner.update(progresspercentage);
+                    listner.updateProgress(progresspercentage);
                 } catch (Exception e) {
                     // TODO: handle exception
                     e.printStackTrace();
-                    listner.end();
+                    listner.endProgress();
                 }
             }
             // dismiss progress after sending
-            listner.end();
+            listner.endProgress();
             out.close();
             inputStream.close();
         } catch (IOException e) {
@@ -270,13 +288,5 @@ public class FileTransferService extends IntentService {
             return false;
         }
         return true;
-    }
-
-    public interface FileProgressListner extends Serializable {
-        void update(int progress);
-
-        void end();
-
-        void finish();
     }
 }

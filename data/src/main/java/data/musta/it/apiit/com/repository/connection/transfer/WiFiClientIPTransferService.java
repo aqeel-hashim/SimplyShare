@@ -1,13 +1,11 @@
 package data.musta.it.apiit.com.repository.connection.transfer;
 
 import android.app.IntentService;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
@@ -51,8 +49,6 @@ public class WiFiClientIPTransferService extends IntentService {
                 socket.connect((new InetSocketAddress(host, port)), FileTransferService.SOCKET_TIMEOUT);
                 Log.d(TAG, "Client socket - " + socket.isConnected());
                 OutputStream stream = socket.getOutputStream();
-                ContentResolver cr = getContentResolver();
-                InputStream is = null;
                 
                /*
                 * Object that is used to send file name with extension and recieved on other side.

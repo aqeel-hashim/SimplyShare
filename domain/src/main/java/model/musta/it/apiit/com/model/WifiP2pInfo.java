@@ -1,7 +1,6 @@
 package model.musta.it.apiit.com.model;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * Created by musta on 20-Jan-18.

@@ -70,6 +70,14 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+
+        <service
+            android:name="data.musta.it.apiit.com.repository.connection.transfer.FileTransferService"
+            android:enabled="true" />
+        <service
+            android:name="data.musta.it.apiit.com.repository.connection.transfer.WiFiClientIPTransferService"
+            android:enabled="true" />
+
     </application>
 
 </manifest>

@@ -21,9 +21,31 @@
         android:textSize="25sp"
         android:textColor="@android:color/white"/>
     <ImageView
+        android:id="@+id/centerImage"
         android:layout_width="75dp"
         android:layout_height="75dp"
         android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:src="@mipmap/ic_launcher"/>
+
+    <TextView
+        android:id="@+id/broadcasting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:layout_below="@+id/centerImage"
+        android:text="Broadcasting..."
+        android:textAlignment="center" />
+
+    <TextView
+        android:id="@+id/currentDeviceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:layout_below="@+id/broadcasting"
+        android:textAlignment="center" />
 </com.skyfishjy.library.RippleBackground>

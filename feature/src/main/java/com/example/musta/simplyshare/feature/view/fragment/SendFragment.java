@@ -26,6 +26,7 @@ import java.util.List;
 import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
 import model.musta.it.apiit.com.model.WifiP2pInfo;
@@ -53,6 +54,8 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     private RecyclerView recyclerView;
 
     private Device device;
+
+    private boolean connected = false;
 
     public SendFragment() {
         // Required empty public constructor
@@ -103,9 +106,24 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, new TransferProgressListener() {
+            @Override
+            public void updateProgress(int progress) {
+
+            }
+
+            @Override
+            public void endProgress() {
+
+            }
+
+            @Override
+            public void transferFinished() {
+
+            }
+        });
         presenter = new DeviceViewPresenter(deviceManager);
-        presenter.initialize();
+
         return view;
     }
 
@@ -113,8 +131,10 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     @Override
     public void onResume() {
         super.onResume();
+        presenter.initialize();
         presenter.resume();
         ((DeviceWifiPP2PManager)deviceManager).addOnPeersChangedListner(this);
+
     }
 
     @Override
@@ -136,6 +156,9 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     @Override
     public void enable(boolean enable) {
         this.wifienabled = enable;
+        if (enable) {
+
+        }
         Log.d(TAG, "enable: "+enable);
     }
 
@@ -150,16 +173,29 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     @Override
     public void connected(WifiP2pInfo info) {
         Log.d(TAG, "connected: "+info.groupOwnerAddress);
-        presenter.connectionHandshake(info);
-        ProgressFragment fragment = ProgressFragment.newInstance(new ArrayList<>(itemModels));
-        getActivity().findViewById(R.id.container).setVisibility(View.VISIBLE);
-        FragmentManager fm = getActivity().getSupportFragmentManager();
-        fm.beginTransaction().replace(R.id.container, fragment, "SendFragment").addToBackStack(null).commit();
+        if (!connected) {
+
+            connected = true;
+            presenter.connectionHandshake(info);
+
+            ProgressFragment fragment = ProgressFragment.newInstance(new ArrayList<>(itemModels), presenter);
+
+            View view = getActivity() != null ? getActivity().findViewById(R.id.container) : null;
+            if (view != null) view.setVisibility(View.VISIBLE);
+
+            FragmentManager fm = getActivity() != null ? getActivity().getSupportFragmentManager() : null;
+            if (fm != null)
+                fm.beginTransaction().replace(R.id.container, fragment, "ProgressFragment").addToBackStack(null).commit();
+        }
     }
 
     @Override
     public void disconnected() {
         Log.d(TAG, "disconnected: ");
+        if (connected) {
+            getActivity().getSupportFragmentManager().popBackStackImmediate();
+            connected = false;
+        }
     }
 
     @Override
@@ -172,5 +208,12 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     public void connect(DeviceModel device) {
         Log.d(TAG, "connect: CLICK PASSED ---> "+device.getName());
         presenter.connect(device);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.destroy();
+
     }
 }

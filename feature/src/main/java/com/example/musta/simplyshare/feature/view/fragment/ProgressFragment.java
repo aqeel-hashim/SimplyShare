@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
+import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
 import com.example.musta.simplyshare.feature.view.adapter.ItemProgressAdapter;
 
 import java.util.ArrayList;
@@ -25,10 +26,14 @@ public class ProgressFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_ITEM_LIST = "itemModelList";
+    private static final String ARG_PRESENTER = "PRESENTER";
+
     private static final String TAG = SendFragment.class.getSimpleName();
 
     // TODO: Rename and change types of parameters
     private List<ItemModel> itemModels;
+    private DeviceViewPresenter presenter;
+    private ItemProgressAdapter adapter;
 
 
     public ProgressFragment() {
@@ -43,10 +48,11 @@ public class ProgressFragment extends Fragment {
      * @return A new instance of fragment ProgressFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ProgressFragment newInstance(ArrayList<ItemModel> itemModels) {
+    public static ProgressFragment newInstance(ArrayList<ItemModel> itemModels, DeviceViewPresenter presenter) {
         ProgressFragment fragment = new ProgressFragment();
         Bundle args = new Bundle();
         args.putParcelableArrayList(ARG_ITEM_LIST, itemModels);
+        fragment.presenter = presenter;
         fragment.setArguments(args);
         return fragment;
     }
@@ -66,11 +72,17 @@ public class ProgressFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_progress, container, false);
 
         RecyclerView recyclerView = view.findViewById(R.id.itemProgressList);
-        ItemProgressAdapter adapter = new ItemProgressAdapter(itemModels);
+        adapter = new ItemProgressAdapter(itemModels, getContext());
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
         return view;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.destroy();
+        adapter.pause();
+    }
 }

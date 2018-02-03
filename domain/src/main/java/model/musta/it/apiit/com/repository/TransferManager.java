@@ -9,4 +9,6 @@ import model.musta.it.apiit.com.model.Item;
 
 public interface TransferManager {
     void send(Item item, TransferProgressListener listener);
+
+    void unregisterReceivers();
 }

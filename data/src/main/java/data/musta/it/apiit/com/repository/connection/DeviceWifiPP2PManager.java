@@ -8,6 +8,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import data.musta.it.apiit.com.repository.connection.transfer.FirstConnectionMes
 import data.musta.it.apiit.com.util.SharedPrefManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
 import model.musta.it.apiit.com.model.WifiP2pInfo;
@@ -33,7 +35,7 @@ import static data.musta.it.apiit.com.cache.ItemCacheImpl.cacheName;
  * Created by musta on 20-Jan-18.
  */
 
-public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListner, WiFiDirectBroadcastReceiver.CurrentDeviceUpdateListner {
+public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListner, WiFiDirectBroadcastReceiver.CurrentDeviceUpdateListner, Serializable {
 
     Context context;
     WifiP2pManager manager;
@@ -48,11 +50,13 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
 
     private static final String TAG = DeviceWifiPP2PManager.class.getSimpleName();
     public static boolean ClientCheck = false;
+    private TransferProgressListener listner;
 
-    public DeviceWifiPP2PManager(Context context, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner) {
+    public DeviceWifiPP2PManager(Context context, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, TransferProgressListener listner) {
         this.context = context;
         this.wifiP2PEnbleListner = wifiP2PEnbleListner;
         this.connectionListner = connectionListner;
+        this.listner = listner;
         devices = new ArrayList<>();
         manager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
         intentFilters = new IntentFilter();
@@ -94,7 +98,66 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
 
     @Override
     public void pause() {
-        context.unregisterReceiver(receiver);
+
+        manager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(TAG, "onFailure: Stop Peer Discovery reason: " + reason);
+            }
+        });
+        try {
+            context.unregisterReceiver(receiver);
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "pause: receiver not registered");
+        }
+    }
+
+    @Override
+    public void destroy() {
+        disconnect();
+
+        manager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(TAG, "onFailure: Stop Peer Discovery reason: " + reason);
+            }
+        });
+
+
+        manager.clearLocalServices(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(TAG, "onFailure: Clear Local Services reason: " + reason);
+            }
+        });
+
+        manager.clearServiceRequests(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                Log.d(TAG, "onFailure: Clear Service Requests reason: " + reason);
+            }
+        });
+
     }
 
     @Override
@@ -108,11 +171,10 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
 //        if(!found) return;
 
         Log.d(TAG, "connect: Name ---> "+device.getName()+"\nMAC ---> "+device.getMacAddress());
-
         WifiP2pConfig config = new WifiP2pConfig();
         config.deviceAddress = device.getMacAddress();
         config.wps.setup = WpsInfo.PBC;
-
+        config.groupOwnerIntent = 15;
         manager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -137,17 +199,19 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
             if (info.groupFormed && info.isGroupOwner) {
 
                 SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).put(context.getString(R.string.pref_ServerBoolean), "true");
-                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT);
+                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner);
                 fileServerAsyncTask.execute();
 
             } else {
                 if (!ClientCheck) {
+                    Log.d(TAG, "sendConnectionMessage: " + currentDevice.getIpAddress() + " Name: " + currentDevice.getDevice().deviceName);
                     FirstConnectionMessage firstConnectionMessage = new FirstConnectionMessage(info, context, currentDevice);
                     firstConnectionMessage.execute();
                 }
 
-                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT);
+                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner);
                 fileServerAsyncTask.execute();
+
             }
 
 
@@ -201,6 +265,28 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         } catch (Exception ex) {
         } // for now eat exceptions
         return "";
+    }
+
+    private void disconnect() {
+        if (manager != null && mChannel != null) {
+            manager.requestGroupInfo(mChannel, group -> {
+                if (group != null && manager != null && mChannel != null
+                        /*&& group.isGroupOwner()*/) {
+                    manager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+
+                        @Override
+                        public void onSuccess() {
+                            Log.d(TAG, "removeGroup onSuccess -");
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Log.d(TAG, "removeGroup onFailure -" + reason);
+                        }
+                    });
+                }
+            });
+        }
     }
 
 

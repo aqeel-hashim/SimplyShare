@@ -2,6 +2,8 @@ package com.example.musta.simplyshare.feature.presenter;
 
 import com.example.musta.simplyshare.feature.model.DeviceModel;
 
+import java.io.Serializable;
+
 import model.musta.it.apiit.com.model.Device;
 import model.musta.it.apiit.com.model.WifiP2pInfo;
 import model.musta.it.apiit.com.repository.DeviceManager;
@@ -10,7 +12,7 @@ import model.musta.it.apiit.com.repository.DeviceManager;
  * Created by musta on 20-Jan-18.
  */
 
-public class DeviceViewPresenter{
+public class DeviceViewPresenter implements Serializable {
 
     private DeviceManager deviceManager;
 
@@ -28,7 +30,7 @@ public class DeviceViewPresenter{
     }
 
     public void destroy(){
-        deviceManager = null;
+        deviceManager.destroy();
     }
 
     public void initialize(){

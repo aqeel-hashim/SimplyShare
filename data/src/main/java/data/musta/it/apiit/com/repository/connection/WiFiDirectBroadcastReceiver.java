@@ -24,6 +24,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.util.Log;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +38,7 @@ import model.musta.it.apiit.com.model.Device;
 /**
  * A BroadcastReceiver that notifies of important wifi p2p events.
  */
-public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
+public class WiFiDirectBroadcastReceiver extends BroadcastReceiver implements Serializable {
 
     private WifiP2pManager manager;
     private Channel channel;
@@ -49,9 +50,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     /**
      * @param manager WifiP2pManager system service
      * @param channel Wifi p2p channel
-     * @param wifiP2PEnbleListner
-     * @param connectionListner
-     * @param updateListner
+     * @param wifiP2PEnbleListner Listener for enabled WiFiP2P
+     * @param connectionListner Listener for connectioin changes
+     * @param updateListner Listener for WiFi P2P updates e.g PeerList changes
      */
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, CurrentDeviceUpdateListner updateListner) {
         super();
@@ -96,7 +97,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 //                activity.setIsWifiP2pEnabled(false);
 //                activity.resetData();
 
-                wifiP2PEnbleListner.enable(true);
+                wifiP2PEnbleListner.enable(false);
 
             }
             //Log.d(WifiActivity.TAG, "P2P state changed - " + state);
@@ -130,7 +131,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 // we are connected with the other device, request connection
                 // info to find group owner IP
-
                 manager.requestConnectionInfo(channel, info -> {
                     for (ConnectionListner listner : this.listners)
                         listner.connected(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));

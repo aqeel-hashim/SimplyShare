@@ -31,9 +31,26 @@ public class ItemEntityMapper {
         File file = new File(item.getPath());
         if (item != null && !file.isDirectory())
             itemEntity = new ItemEntity(item.getId(), item.getName(), Double.toString(item.getSize()), new Date(file.lastModified()).toString(),
-                    item.getPath().split(".")[item.getPath().split(".").length - 1],
-                    item.getData(), item.getPath(), item.getType());
+                    getExtension(item.getPath()),
+                    new byte[1], item.getPath(), item.getType());
         return itemEntity;
+    }
+
+    public static String getExtension(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        int extensionPos = filename.lastIndexOf('.');
+        int lastUnixPos = filename.lastIndexOf('/');
+        int lastWindowsPos = filename.lastIndexOf('\\');
+        int lastSeparator = Math.max(lastUnixPos, lastWindowsPos);
+
+        int index = lastSeparator > extensionPos ? -1 : extensionPos;
+        if (index == -1) {
+            return "";
+        } else {
+            return filename.substring(index + 1);
+        }
     }
 
     public List<ItemEntity> revertList(List<Item> items) {

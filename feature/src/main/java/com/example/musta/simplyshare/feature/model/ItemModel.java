@@ -6,6 +6,8 @@ import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import model.musta.it.apiit.com.model.Item;
+
 /**
  * Created by musta on 23-Dec-17.
  */
@@ -15,12 +17,14 @@ public class ItemModel implements Parcelable{
     private String path;
     private String size;
     private Drawable icon;
+    private Item.Type type;
 
-    public ItemModel(String name, String path, String size, Drawable icon) {
+    public ItemModel(String name, String path, String size, Drawable icon, Item.Type type) {
         this.name = name;
         this.path = path;
         this.size = size;
         this.icon = icon;
+        this.type = type;
     }
 
     public ItemModel() {
@@ -28,6 +32,7 @@ public class ItemModel implements Parcelable{
         this.path = "";
         this.size = "";
         this.icon = null;
+        this.type = Item.Type.APPLICATION;
     }
 
     protected ItemModel(Parcel in) {
@@ -36,6 +41,7 @@ public class ItemModel implements Parcelable{
         size = in.readString();
         Bitmap bitmap = in.readParcelable(getClass().getClassLoader());
         icon = new BitmapDrawable(bitmap);
+        this.type = Item.Type.values()[in.readInt()];
     }
 
     public static final Creator<ItemModel> CREATOR = new Creator<ItemModel>() {
@@ -82,22 +88,35 @@ public class ItemModel implements Parcelable{
         this.size = size;
     }
 
+    public Item.Type getType() {
+        return type;
+    }
+
+    public void setType(Item.Type type) {
+        this.type = type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (!(o instanceof ItemModel)) return false;
 
         ItemModel itemModel = (ItemModel) o;
 
-        return getSize().equals(itemModel.getSize()) && getName().equals(itemModel.getName()) && getPath().equals(itemModel.getPath()) && getIcon().equals(itemModel.getIcon());
+        if (name != null ? !name.equals(itemModel.name) : itemModel.name != null) return false;
+        if (path != null ? !path.equals(itemModel.path) : itemModel.path != null) return false;
+        if (size != null ? !size.equals(itemModel.size) : itemModel.size != null) return false;
+        if (!icon.equals(itemModel.icon)) return false;
+        return type == itemModel.type;
     }
 
     @Override
     public int hashCode() {
-        int result = getName().hashCode();
-        result = 31 * result + getPath().hashCode();
-        result = 31 * result + getIcon().hashCode();
-        result = 31 * result + getSize().hashCode();
+        int result = name != null ? name.hashCode() : 0;
+        result = 31 * result + (path != null ? path.hashCode() : 0);
+        result = 31 * result + (size != null ? size.hashCode() : 0);
+        result = 31 * result + icon.hashCode();
+        result = 31 * result + (type != null ? type.hashCode() : 0);
         return result;
     }
 
@@ -108,6 +127,7 @@ public class ItemModel implements Parcelable{
                 ", path='" + path + '\'' +
                 ", size='" + size + '\'' +
                 ", icon=" + icon +
+                ", type=" + type +
                 '}';
     }
 
@@ -126,7 +146,8 @@ public class ItemModel implements Parcelable{
         dest.writeString(name);
         dest.writeString(path);
         dest.writeString(size);
-        Bitmap bitmap = (Bitmap)((BitmapDrawable) icon).getBitmap();
+        Bitmap bitmap = ((BitmapDrawable) icon).getBitmap();
         dest.writeParcelable(bitmap, flags);
+        dest.writeInt(type.ordinal());
     }
 }

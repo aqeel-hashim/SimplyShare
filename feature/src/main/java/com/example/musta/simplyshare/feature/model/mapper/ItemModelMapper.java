@@ -43,6 +43,7 @@ public class ItemModelMapper {
                         icon = context.getPackageManager().getApplicationIcon(item.getId());
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();
+
                     }
                     break;
                 case VIDEO:
@@ -58,12 +59,20 @@ public class ItemModelMapper {
                     break;
             }
 
-            itemModel = new ItemModel(item.getName() != null && !TextUtils.isEmpty(item.getName()) ? item.getName().length() > 54 ? item.getName().substring(0, 50) + " ..." : item.getName() : file.getName(), item.getPath(), file.length() > 1048576 ? String.format(Locale.ENGLISH, "%.2f MB", file.exists() ? ((double) file.length()) / 1024.0f / 1024.0f : 0.0) : String.format(Locale.ENGLISH, "%.2f KB", file.exists() ? ((double) file.length()) / 1024.0f : 0.0), icon);
+            itemModel = new ItemModel(item.getName() != null && !TextUtils.isEmpty(item.getName()) ? item.getName().length() > 54 ? item.getName().substring(0, 50) + " ..." : item.getName() :
+                    file.getName(),
+                    item.getPath(),
+                    file.length() > 1048576 ? String.format(Locale.ENGLISH, "%.2f MB",
+                            file.exists() ? ((double) file.length()) / 1024.0f / 1024.0f : 0.0) :
+                            String.format(Locale.ENGLISH, "%.2f KB", file.exists() ?
+                                    ((double) file.length()) / 1024.0f : 0.0),
+                    icon,
+                    item.getType());
         }
         return itemModel;
     }
 
-    public Item revert(ItemModel itemModel, Item.Type typeRevert) {
+    public Item revert(ItemModel itemModel) {
         Item item = null;
         File file = null;
         if (itemModel != null) {
@@ -78,16 +87,16 @@ public class ItemModelMapper {
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-            item = new Item("UNKNOW", itemModel.getName(), Double.parseDouble(Long.toString(file.length())), data, itemModel.getPath(), typeRevert);
+            item = new Item("UNKNOW", itemModel.getName(), Double.parseDouble(Long.toString(file.length())), data, itemModel.getPath(), itemModel.getType());
 
         }
         return item;
     }
 
-    public List<Item> revertList(List<ItemModel> itemModels, Item.Type type) {
+    public List<Item> revertList(List<ItemModel> itemModels) {
         List<Item> items = new ArrayList<>();
         if (itemModels != null && !itemModels.isEmpty())
-            items = Collections.convertList(itemModels, im -> revert(im, type));
+            items = Collections.convertList(itemModels, this::revert);
         return items;
     }
 

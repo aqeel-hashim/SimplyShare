@@ -1,9 +1,10 @@
 package model.musta.it.apiit.com.model;
 
+import java.io.Serializable;
 import java.util.Arrays;
 
-public class Item {
-    public enum Type{
+public class Item implements Serializable {
+    public enum Type implements Serializable {
         APPLICATION,
         FILE,
         MUSIC,

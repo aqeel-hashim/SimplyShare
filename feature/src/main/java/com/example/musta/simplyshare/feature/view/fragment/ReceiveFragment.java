@@ -3,9 +3,11 @@ package com.example.musta.simplyshare.feature.view.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
@@ -16,6 +18,7 @@ import java.util.List;
 import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
 import model.musta.it.apiit.com.model.WifiP2pInfo;
@@ -32,12 +35,18 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
+    private static final String TAG = ReceiveFragment.class.getSimpleName();
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
+    private TextView nameText;
+    private TextView broadcastText;
+
     private DeviceViewPresenter presenter;
     private DeviceManager deviceManager;
+
+    private boolean connected = false;
     public ReceiveFragment() {
         // Required empty public constructor
     }
@@ -76,8 +85,26 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
         View view = inflater.inflate(R.layout.fragment_receive, container, false);
         final RippleBackground rippleBackground = view.findViewById(R.id.content);
         rippleBackground.startRippleAnimation();
+        nameText = view.findViewById(R.id.currentDeviceName);
+        broadcastText = view.findViewById(R.id.broadcasting);
+        broadcastText.setText("Broadcasting...");
         //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this);
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, new TransferProgressListener() {
+            @Override
+            public void updateProgress(int progress) {
+                Log.d(TAG, " file progress update: " + progress);
+            }
+
+            @Override
+            public void endProgress() {
+                Log.d(TAG, " file progress end: ");
+            }
+
+            @Override
+            public void transferFinished() {
+                Log.d(TAG, " file progress finish: ");
+            }
+        });
         presenter = new DeviceViewPresenter(deviceManager);
         presenter.initialize();
         return view;
@@ -88,6 +115,7 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
         super.onResume();
         presenter.resume();
         ((DeviceWifiPP2PManager) deviceManager).addOnPeersChangedListner(this);
+
     }
 
     @Override
@@ -104,7 +132,9 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
 
     @Override
     public void enable(boolean enable) {
+        if (enable) {
 
+        }
     }
 
     @Override
@@ -114,16 +144,29 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
 
     @Override
     public void connected(WifiP2pInfo info) {
-        deviceManager.sendConnectionMessage(info);
+        if (!connected) {
+            presenter.connectionHandshake(info);
+            broadcastText.setText("Connected");
+            connected = true;
+        }
     }
 
     @Override
     public void disconnected() {
-
+        broadcastText.setText("Broadcasting...");
+        if (connected) {
+            presenter.pause();
+            presenter.destroy();
+            presenter.initialize();
+            presenter.resume();
+            connected = false;
+        }
     }
 
     @Override
     public void updateCurrentDevice(Device device) {
-
+        nameText.setText("My Device: " + device.getName());
     }
+
+
 }

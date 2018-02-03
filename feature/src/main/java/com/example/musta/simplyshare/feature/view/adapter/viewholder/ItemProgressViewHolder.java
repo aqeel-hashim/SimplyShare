@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.model.ItemModel;
+import com.example.musta.simplyshare.feature.model.mapper.ItemModelMapper;
+import com.example.musta.simplyshare.feature.presenter.TransferViewPresenter;
 
 /**
  * Created by Aqeel Hashim on 27-Jan-18.
@@ -15,10 +17,10 @@ import com.example.musta.simplyshare.feature.model.ItemModel;
 
 public class ItemProgressViewHolder extends RecyclerView.ViewHolder {
 
-    private ProgressBar progressBar;
-    private ImageView itemimage;
-    private TextView name;
-    private View mainView;
+    private transient ProgressBar progressBar;
+    private transient ImageView itemimage;
+    private transient TextView name;
+    private transient View mainView;
 
     public ItemProgressViewHolder(View itemView) {
         super(itemView);
@@ -28,10 +30,11 @@ public class ItemProgressViewHolder extends RecyclerView.ViewHolder {
         name = itemView.findViewById(R.id.itemName);
     }
 
-    public void bind(ItemModel model) {
+    public void bind(ItemModel model, TransferViewPresenter presenter) {
         itemimage.setImageDrawable(model.getIcon());
         name.setText(model.getName());
-        progressBar.setProgress(50, true);
+        progressBar.setProgress(0, true);
+        presenter.send(new ItemModelMapper(mainView.getContext()).revert(model), new ProgressUpdator(progressBar));
         float deviceScreenHeight = mainView.getContext().getResources().getDisplayMetrics().heightPixels;
 
     }

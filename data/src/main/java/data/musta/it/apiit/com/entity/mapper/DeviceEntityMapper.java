@@ -30,6 +30,15 @@ public class DeviceEntityMapper {
         return device;
     }
 
+    public DeviceEntity revert(Device device) {
+        DeviceEntity deviceEntity = null;
+        if (device != null) {
+            deviceEntity = new DeviceEntity(device.getIpAddress(), new data.musta.it.apiit.com.entity.WifiP2pDevice(device.getName(), device.getMacAddress()));
+        }
+
+        return deviceEntity;
+    }
+
     public List<Device> transformList(List<DeviceEntity> deviceEntities){
         List<Device> devices = null;
         if(deviceEntities != null)

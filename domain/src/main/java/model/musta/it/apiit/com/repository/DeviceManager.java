@@ -12,7 +12,8 @@ public interface DeviceManager {
     void discoverPeers();
     void resume();
     void pause();
-    void connect(Device device);
 
+    void destroy();
+    void connect(Device device);
     void sendConnectionMessage(WifiP2pInfo info);
 }

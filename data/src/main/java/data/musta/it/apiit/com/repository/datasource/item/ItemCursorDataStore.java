@@ -43,9 +43,6 @@ public class ItemCursorDataStore implements ItemDataSource {
                 List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
                 ArrayList<ItemEntity> applicationList = new ArrayList<ItemEntity>();
                 for (ApplicationInfo packageInfo : packages) {
-                    System.out.println("Installed package :" + packageInfo.loadLabel(context.getPackageManager()).toString());
-                    System.out.println("Source dir : " + packageInfo.publicSourceDir);
-                    System.out.println("Launch Activity :" + pm.getLaunchIntentForPackage(packageInfo.packageName));
                     File file = new File(packageInfo.publicSourceDir);
                     float size = file.length();
                     String ext = packageInfo.publicSourceDir;
@@ -154,13 +151,6 @@ public class ItemCursorDataStore implements ItemDataSource {
                         new byte[100],
                         cursor.getString(cursor
                                 .getColumnIndex(data)), type);
-                System.out.println("FIle :" + cursor.getString(cursor
-                        .getColumnIndex(data)).split("/")[cursor.getString(cursor
-                        .getColumnIndex(data)).split("/").length - 1]);
-                System.out.println("Source dir : " + cursor.getString(cursor
-                        .getColumnIndex(data)));
-                System.out.println("Source size : " + cursor.getString(cursor
-                        .getColumnIndex(size)));
                 items.add(itemEntity);
 
             }

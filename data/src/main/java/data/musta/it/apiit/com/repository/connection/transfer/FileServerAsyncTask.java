@@ -3,7 +3,6 @@ package data.musta.it.apiit.com.repository.connection.transfer;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.os.Handler;
 import android.util.Log;
 
 import java.io.File;
@@ -18,6 +17,7 @@ import java.net.Socket;
 import data.musta.it.apiit.com.R;
 import data.musta.it.apiit.com.entity.TransferEntity;
 import data.musta.it.apiit.com.util.SharedPrefManager;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 
 import static data.musta.it.apiit.com.cache.ItemCacheImpl.cacheName;
 
@@ -27,14 +27,9 @@ import static data.musta.it.apiit.com.cache.ItemCacheImpl.cacheName;
 
 public class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
-    private final Handler handler;
-    //        private TextView statusText;
-    private Context mFilecontext;
-    private String Extension, Key;
-    private File EncryptedFile;
     private long ReceivedFileLength;
     private int PORT;
-    private FileTransferService.FileProgressListner listner;
+    private TransferProgressListener listner;
     private String WiFiClientIp;
     public static String FolderName = "SimplyShare";
     private static final String TAG = FileServerAsyncTask.class.getSimpleName();
@@ -44,10 +39,11 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
     /**
      * @param context
      * @param port
+     * @param listner
      */
-    public FileServerAsyncTask(Context context, int port) {
-        this.mFilecontext = context;
-        handler = new Handler();
+    public FileServerAsyncTask(Context context, int port, TransferProgressListener listner) {
+        this.context = context;
+        this.listner = listner;
         this.PORT = port;
 
 
@@ -57,6 +53,7 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... params) {
         try {
+
 
             Log.d(TAG, "doInBackground: " + "File Async task port" + "File Async task port-> " + PORT);
             // init handler for progressdialog
@@ -80,9 +77,7 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
 
                 if (obj != null) {
                     InetAddress = obj.getDeviceEntity().getIpAddress();
-                    if (InetAddress != null
-                            && InetAddress
-                            .equalsIgnoreCase(FileTransferService.inetaddress)) {
+                    if (InetAddress != null && !InetAddress.isEmpty()) {
 
                         Log.e(TAG, "doInBackground: " + "File Async Group Client Ip" + "port-> "
                                 + WiFiClientIp);
@@ -109,15 +104,12 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
                         return "Demo";
                     }
 
-                    final Runnable r = new Runnable() {
-
-                        public void run() {
-                            // TODO Auto-generated method stub
-                            listner.end();
-                        }
-                    };
-                    handler.post(r);
-
+//                    final Runnable r = () -> {
+//                        // TODO Auto-generated method stub
+//                        listner.endProgress();
+//                    };
+                    //handler.post(r);
+                    if (obj.getItemEntity() != null && obj.getItemEntity().getName() != null && !obj.getItemEntity().getName().isEmpty())
                     Log.d(TAG, "doInBackground: " + "FileName got from socket on other side->>> " +
                             obj.getItemEntity().getName());
                 }
@@ -125,7 +117,7 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
                 final File f = new File(
                         Environment.getExternalStorageDirectory() + "/"
                                 + FolderName + "/"
-                                + obj.getItemEntity().getName());
+                                + obj.getItemEntity().getName() + "." + obj.getItemEntity().getExt());
 
                 File dirs = new File(f.getParent());
                 if (!dirs.exists())
@@ -135,7 +127,7 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
 				/*
                  * Recieve file length and copy after it
 				 */
-                this.ReceivedFileLength = Long.parseLong(obj.getItemEntity().getSize());
+                this.ReceivedFileLength = (long) Double.parseDouble(obj.getItemEntity().getSize());
 
                 InputStream inputstream = client.getInputStream();
 
@@ -144,7 +136,7 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
                         ReceivedFileLength, listner);
 
                 if (obj.getItemEntity().isEndTransfer())
-                    listner.finish();
+                    listner.transferFinished();
 
                 ois.close(); // close the ObjectOutputStream object after saving
                 // file to storage.
@@ -153,8 +145,6 @@ public class FileServerAsyncTask extends AsyncTask<String, String, String> {
 				/*
                  * Set file related data and decrypt file in postExecute.
 				 */
-                this.Extension = obj.getItemEntity().getName();
-                this.EncryptedFile = f;
                 return f.getAbsolutePath();
 
             } catch (ClassNotFoundException e) {
