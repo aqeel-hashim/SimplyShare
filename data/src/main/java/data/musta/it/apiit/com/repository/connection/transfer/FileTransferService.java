@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.support.v4.content.FileProvider;
+import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -21,10 +22,26 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Objects;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import data.musta.it.apiit.com.BuildConfig;
+import data.musta.it.apiit.com.entity.ItemEntity;
 import data.musta.it.apiit.com.entity.TransferEntity;
+import data.musta.it.apiit.com.util.SharedPrefManager;
 import model.musta.it.apiit.com.interactor.TransferProgressListener;
+
+import static data.musta.it.apiit.com.repository.connection.transfer.FileTransferBroadcastReceiver.PROGRESS_ITEM;
 
 /**
  * A service that process each file transfer request i.e Intent by opening a
@@ -105,13 +122,13 @@ public class FileTransferService extends IntentService {
                 try {
                     is = cr.openInputStream(Uri.fromFile(new File(item.getItemEntity().getPath())));
                 } catch (FileNotFoundException e) {
-                    Log.d(TAG, e.toString());
+                    Log.d(TAG, " when trying get input stream for file: " + e.toString());
                 }
-                copyFile(actualFileLength, is, stream);
+                copyFile(actualFileLength, is, stream, item.getItemEntity());
                 Log.d(TAG, "Client: Data written");
                 oos.close();    //close the ObjectOutputStream after sending data.
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, " when trying to connect: " + e.getMessage());
                 e.printStackTrace();
                 Log.e(TAG, "onHandleIntent: " + "Unable to connect host" + "service socket error in wififiletransferservice class");
                 mHandler.post(() -> {
@@ -121,6 +138,7 @@ public class FileTransferService extends IntentService {
 //                listner.endProgress();
                 Intent intentResponse = new Intent();
                 intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+                intent.putExtra(PROGRESS_ITEM, item.getItemEntity());
                 intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
                 sendBroadcast(intentResponse);
 
@@ -131,6 +149,7 @@ public class FileTransferService extends IntentService {
                             socket.close();
                         } catch (IOException e) {
                             // Give up
+                            Log.e(TAG, "onHandleIntent: when closing");
                             e.printStackTrace();
                         }
                     }
@@ -200,27 +219,48 @@ public class FileTransferService extends IntentService {
     }
 
 
-    private boolean copyFile(int ActualFilelength, InputStream inputStream, OutputStream out) {
+    private boolean copyFile(int ActualFilelength, InputStream inputStream, OutputStream out, ItemEntity itemEntity) {
         long total = 0;
         int Percentage = 0;
+        int oldPercentage = -1;
         byte buf[] = new byte[FileTransferService.ByteSize];
         if (buf == null) return false;
 
         int len;
         try {
             while ((len = inputStream.read(buf)) != -1) {
+
+                String storedPublicKey = SharedPrefManager.getInstance(getApplicationContext()).get("SIMPLYSHAREOPPOSINGPUBLICKEY", "EMPTY");
+
+                if (!Objects.equals(storedPublicKey, "EMPTY")) {
+                    byte[] keyBytes = Base64.decode(storedPublicKey, Base64.DEFAULT);
+                    X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+                    try {
+                        KeyFactory kf = KeyFactory.getInstance("RSA");
+                        PublicKey key = kf.generatePublic(spec);
+                        Cipher cipher = Cipher.getInstance("RSA");
+                        cipher.init(Cipher.ENCRYPT_MODE, key);
+                        buf = cipher.doFinal(buf);
+                    } catch (NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
+                        e.printStackTrace();
+                    }
+                }
                 out.write(buf, 0, len);
                 try {
                     total += len;
                     if (ActualFilelength > 0) {
                         Percentage = (int) ((total * 100) / ActualFilelength);
                     }
-                    Intent intentResponse = new Intent();
-                    intentResponse.setAction(FileTransferBroadcastReceiver.UPDATE_TRANSFER
-                    );
-                    intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
-                    intentResponse.putExtra(FileTransferBroadcastReceiver.PROGRESS, Percentage);
-                    sendBroadcast(intentResponse);
+                    if (oldPercentage != Percentage) {
+                        Intent intentResponse = new Intent();
+                        intentResponse.setAction(FileTransferBroadcastReceiver.UPDATE_TRANSFER
+                        );
+                        intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
+                        intentResponse.putExtra(FileTransferBroadcastReceiver.PROGRESS, Percentage);
+                        intentResponse.putExtra(PROGRESS_ITEM, itemEntity);
+                        sendBroadcast(intentResponse);
+                        oldPercentage = Percentage;
+                    }
                     //listner.updateProgress(Percentage);
                 } catch (Exception e) {
                     // TODO: handle exception
@@ -230,6 +270,7 @@ public class FileTransferService extends IntentService {
 
                     Intent intentResponse = new Intent();
                     intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+                    intentResponse.putExtra(PROGRESS_ITEM, itemEntity);
                     intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
                     sendBroadcast(intentResponse);
 //                    listner.endProgress();
@@ -239,6 +280,7 @@ public class FileTransferService extends IntentService {
             //listner.endProgress();
             Intent intentResponse = new Intent();
             intentResponse.setAction(FileTransferBroadcastReceiver.END_TRANSFER);
+            intentResponse.putExtra(PROGRESS_ITEM, itemEntity);
             intentResponse.addCategory(Intent.CATEGORY_DEFAULT);
             sendBroadcast(intentResponse);
             out.close();
@@ -250,43 +292,5 @@ public class FileTransferService extends IntentService {
         return true;
     }
 
-    public static boolean copyRecievedFile(InputStream inputStream,
-                                           OutputStream out, Long length, TransferProgressListener listner) {
 
-        byte buf[] = new byte[FileTransferService.ByteSize];
-        byte Decryptedbuf[] = new byte[FileTransferService.ByteSize];
-        String Decrypted;
-        int len;
-        long total = 0;
-        int progresspercentage = 0;
-        try {
-            while ((len = inputStream.read(buf)) != -1) {
-                try {
-                    out.write(buf, 0, len);
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                try {
-                    total += len;
-                    if (length > 0) {
-                        progresspercentage = (int) ((total * 100) / length);
-                    }
-                    listner.updateProgress(progresspercentage);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                    e.printStackTrace();
-                    listner.endProgress();
-                }
-            }
-            // dismiss progress after sending
-            listner.endProgress();
-            out.close();
-            inputStream.close();
-        } catch (IOException e) {
-            Log.d(TAG, e.toString());
-            return false;
-        }
-        return true;
-    }
 }

@@ -5,22 +5,32 @@ package com.example.musta.simplyshare.feature.model;
  */
 
 public class DeviceModel {
-    private String id;
+    private String ip;
+    private String macAddress;
     private String name;
     private int image;
 
-    public DeviceModel(String id, String name, int image) {
-        this.id = id;
+    public DeviceModel(String ip, String macAddress, String name, int image) {
+        this.ip = ip;
+        this.macAddress = macAddress;
         this.name = name;
         this.image = image;
     }
 
-    public String getId() {
-        return id;
+    public String getIp() {
+        return ip;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getMacAddress() {
+        return macAddress;
+    }
+
+    public void setMacAddress(String macAddress) {
+        this.macAddress = macAddress;
     }
 
     public String getName() {

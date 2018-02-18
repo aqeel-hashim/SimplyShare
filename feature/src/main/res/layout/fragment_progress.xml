@@ -5,20 +5,20 @@
     android:background="#1E88E5"
     tools:context="com.example.musta.simplyshare.feature.view.fragment.ProgressFragment">
 
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="20sp" />
+
     <!-- TODO: Update blank fragment layout -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/itemProgressList"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/titleText"
         android:layout_marginBottom="50dp" />
-
-    <Button
-        android:id="@+id/sendItems"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/my_button_bg"
-        android:text="Send" />
 
 </RelativeLayout>

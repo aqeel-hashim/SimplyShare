@@ -10,6 +10,7 @@ public class TransferEntity implements Serializable {
 
     private ItemEntity itemEntity;
     private DeviceEntity deviceEntity;
+    private byte[] PublicKey;
 
     public TransferEntity(DeviceEntity ip) {
         this.deviceEntity = ip;
@@ -34,5 +35,13 @@ public class TransferEntity implements Serializable {
 
     public void setDeviceEntity(DeviceEntity deviceEntity) {
         this.deviceEntity = deviceEntity;
+    }
+
+    public byte[] getPublicKey() {
+        return PublicKey;
+    }
+
+    public void setPublicKey(byte[] publicKey) {
+        PublicKey = publicKey;
     }
 }

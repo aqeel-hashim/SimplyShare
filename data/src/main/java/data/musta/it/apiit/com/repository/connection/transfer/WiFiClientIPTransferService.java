@@ -58,7 +58,7 @@ public class WiFiClientIPTransferService extends IntentService {
                 oos.writeObject(InetAddress);
                 System.out.println("Sending request to Socket Server");
 
-                oos.close();    //close the ObjectOutputStream after sending data.
+                oos.close();    //close the ObjectOutputStr0eam after sending data.
             } catch (IOException e) {
                 Log.e(TAG, e.getMessage());
                 e.printStackTrace();

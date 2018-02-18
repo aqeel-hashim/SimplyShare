@@ -3,7 +3,7 @@ package com.example.musta.simplyshare.feature.view.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,17 +11,19 @@ import android.widget.TextView;
 
 import com.example.musta.simplyshare.feature.R;
 import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
+import com.example.musta.simplyshare.feature.presenter.TransferViewPresenter;
+import com.example.musta.simplyshare.feature.view.adapter.ItemProgressAdapter;
 import com.skyfishjy.library.RippleBackground;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
+import data.musta.it.apiit.com.repository.connection.WifiP2pTransferManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
-import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
-import model.musta.it.apiit.com.model.WifiP2pInfo;
 import model.musta.it.apiit.com.repository.DeviceManager;
 
 /**
@@ -47,6 +49,8 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
     private DeviceManager deviceManager;
 
     private boolean connected = false;
+    private ProgressFragment progressFragment;
+
     public ReceiveFragment() {
         // Required empty public constructor
     }
@@ -83,38 +87,27 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_receive, container, false);
+
         final RippleBackground rippleBackground = view.findViewById(R.id.content);
         rippleBackground.startRippleAnimation();
+
         nameText = view.findViewById(R.id.currentDeviceName);
         broadcastText = view.findViewById(R.id.broadcasting);
         broadcastText.setText("Broadcasting...");
         //getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, new TransferProgressListener() {
-            @Override
-            public void updateProgress(int progress) {
-                Log.d(TAG, " file progress update: " + progress);
-            }
-
-            @Override
-            public void endProgress() {
-                Log.d(TAG, " file progress end: ");
-            }
-
-            @Override
-            public void transferFinished() {
-                Log.d(TAG, " file progress finish: ");
-            }
-        });
+        ItemProgressAdapter adapter = new ItemProgressAdapter(new ArrayList<>(), getContext(), new TransferViewPresenter(new WifiP2pTransferManager(getContext())), true);
+        progressFragment = ProgressFragment.newInstance(new ArrayList<>(), true, adapter);
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, adapter);
         presenter = new DeviceViewPresenter(deviceManager);
         presenter.initialize();
+
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        presenter.resume();
-        ((DeviceWifiPP2PManager) deviceManager).addOnPeersChangedListner(this);
+        presenter.resume(this);
 
     }
 
@@ -143,10 +136,17 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
     }
 
     @Override
-    public void connected(WifiP2pInfo info) {
+    public void connected() {
         if (!connected) {
-            presenter.connectionHandshake(info);
             broadcastText.setText("Connected");
+//            getActivity().runOnUiThread(() -> Log.d(TAG, "connected: "+info.groupOwnerAddress.getHostName()));
+            View view = getActivity() != null ? getActivity().findViewById(R.id.container) : null;
+            if (view != null) view.setVisibility(View.VISIBLE);
+
+            FragmentManager fm = getActivity() != null ? getActivity().getSupportFragmentManager() : null;
+            if (fm != null)
+                fm.beginTransaction().replace(R.id.container, progressFragment, "ProgressFragment").addToBackStack(null).commit();
+
             connected = true;
         }
     }
@@ -158,7 +158,7 @@ public class ReceiveFragment extends Fragment implements ConnectionListner, OnPe
             presenter.pause();
             presenter.destroy();
             presenter.initialize();
-            presenter.resume();
+            presenter.resume(this);
             connected = false;
         }
     }

@@ -77,7 +77,8 @@ public class ItemCursorDataStore implements ItemDataSource {
                 String mimeTypePDF = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
                 String[] selectionArgs = new String[]{mimeTypePDF};
                 Cursor allNonMediaFiles = cr.query(uri, projection, selection, selectionArgs, sortOrder);
-                List<ItemEntity> itemEntities = readCursor(allNonMediaFiles, null, Item.Type.FILE, MediaStore.Files.FileColumns.DATA, MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.SIZE, MediaStore.Files.FileColumns.DATE_ADDED);
+                List<ItemEntity> itemEntities = readCursor(allNonMediaFiles, null, Item.Type.FILE, MediaStore.Files.FileColumns.DATA,
+                        MediaStore.Files.FileColumns.DISPLAY_NAME, MediaStore.Files.FileColumns.SIZE, MediaStore.Files.FileColumns.DATE_ADDED);
                 itemCache.put(Item.Type.FILE, itemEntities);
                 return itemEntities;
             case MUSIC:
@@ -88,21 +89,24 @@ public class ItemCursorDataStore implements ItemDataSource {
                 if (cursor == null) {
                     return null;
                 }
-                List<ItemEntity> itemEntitiesMusic = readCursor(cursor, MediaStore.Audio.Media.IS_MUSIC, Item.Type.MUSIC, MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.DATE_ADDED);
+                List<ItemEntity> itemEntitiesMusic = readCursor(cursor, MediaStore.Audio.Media.IS_MUSIC, Item.Type.MUSIC,
+                        MediaStore.Audio.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.SIZE, MediaStore.Audio.Media.DATE_ADDED);
                 itemCache.put(Item.Type.MUSIC, itemEntitiesMusic);
                 return itemEntitiesMusic;
             case VIDEO:
                 Cursor cursorVideo = context.getContentResolver().query(
                         MediaStore.Video.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Video.Media.DEFAULT_SORT_ORDER);
-                List<ItemEntity> itemEntitiesVideo = readCursor(cursorVideo, null, Item.Type.VIDEO, MediaStore.Video.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DATE_ADDED);
+                List<ItemEntity> itemEntitiesVideo = readCursor(cursorVideo, null, Item.Type.VIDEO, MediaStore.Video.Media.DATA,
+                        MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Video.Media.SIZE, MediaStore.Video.Media.DATE_ADDED);
                 itemCache.put(Item.Type.VIDEO, itemEntitiesVideo);
                 return itemEntitiesVideo;
             case PICTURE:
                 Cursor cursorPicture = context.getContentResolver().query(
                         MediaStore.Images.Media.EXTERNAL_CONTENT_URI, null, null, null,
                         MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-                List<ItemEntity> itemEntitiesPicture = readCursor(cursorPicture, null, Item.Type.PICTURE, MediaStore.Images.Media.DATA, MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED);
+                List<ItemEntity> itemEntitiesPicture = readCursor(cursorPicture, null, Item.Type.PICTURE, MediaStore.Images.Media.DATA,
+                        MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Images.Media.SIZE, MediaStore.Images.Media.DATE_ADDED);
                 itemCache.put(Item.Type.PICTURE, itemEntitiesPicture);
                 return itemEntitiesPicture;
         }

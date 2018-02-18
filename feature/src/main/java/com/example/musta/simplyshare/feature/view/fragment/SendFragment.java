@@ -16,20 +16,22 @@ import com.example.musta.simplyshare.feature.model.DeviceModel;
 import com.example.musta.simplyshare.feature.model.ItemModel;
 import com.example.musta.simplyshare.feature.model.mapper.DeviceModelMapper;
 import com.example.musta.simplyshare.feature.presenter.DeviceViewPresenter;
+import com.example.musta.simplyshare.feature.presenter.TransferViewPresenter;
+import com.example.musta.simplyshare.feature.view.adapter.ItemProgressAdapter;
 import com.example.musta.simplyshare.feature.view.adapter.RadarDeviceAdapter;
 import com.example.musta.simplyshare.feature.view.adapter.viewholder.RadarDeviceViewholder;
+import com.wang.avi.AVLoadingIndicatorView;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
+import data.musta.it.apiit.com.repository.connection.WifiP2pTransferManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
-import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
-import model.musta.it.apiit.com.model.WifiP2pInfo;
 import model.musta.it.apiit.com.repository.DeviceManager;
 
 /**
@@ -56,6 +58,7 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     private Device device;
 
     private boolean connected = false;
+    private ProgressFragment progressFragment;
 
     public SendFragment() {
         // Required empty public constructor
@@ -103,27 +106,17 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
 
         adapter = new RadarDeviceAdapter(new LinkedList<>(), this);
         recyclerView = view.findViewById(R.id.rvItems);
+
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, new TransferProgressListener() {
-            @Override
-            public void updateProgress(int progress) {
+        AVLoadingIndicatorView indicatorView = view.findViewById(R.id.indicatorView);
+        indicatorView.smoothToShow();
 
-            }
-
-            @Override
-            public void endProgress() {
-
-            }
-
-            @Override
-            public void transferFinished() {
-
-            }
-        });
+        ItemProgressAdapter adapter = new ItemProgressAdapter(new ArrayList<>(itemModels), getContext(), new TransferViewPresenter(new WifiP2pTransferManager(getContext())), false);
+        progressFragment = ProgressFragment.newInstance(new ArrayList<>(itemModels), false, adapter);
+        deviceManager = new DeviceWifiPP2PManager(getContext(), this, this, adapter);
         presenter = new DeviceViewPresenter(deviceManager);
-
         return view;
     }
 
@@ -132,8 +125,7 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     public void onResume() {
         super.onResume();
         presenter.initialize();
-        presenter.resume();
-        ((DeviceWifiPP2PManager)deviceManager).addOnPeersChangedListner(this);
+        presenter.resume(this);
 
     }
 
@@ -171,21 +163,18 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     }
 
     @Override
-    public void connected(WifiP2pInfo info) {
-        Log.d(TAG, "connected: "+info.groupOwnerAddress);
+    public void connected() {
         if (!connected) {
 
             connected = true;
-            presenter.connectionHandshake(info);
 
-            ProgressFragment fragment = ProgressFragment.newInstance(new ArrayList<>(itemModels), presenter);
 
             View view = getActivity() != null ? getActivity().findViewById(R.id.container) : null;
             if (view != null) view.setVisibility(View.VISIBLE);
 
             FragmentManager fm = getActivity() != null ? getActivity().getSupportFragmentManager() : null;
             if (fm != null)
-                fm.beginTransaction().replace(R.id.container, fragment, "ProgressFragment").addToBackStack(null).commit();
+                fm.beginTransaction().replace(R.id.container, progressFragment, "ProgressFragment").addToBackStack(null).commit();
         }
     }
 
@@ -208,6 +197,7 @@ public class SendFragment extends Fragment implements ConnectionListner, OnPeers
     public void connect(DeviceModel device) {
         Log.d(TAG, "connect: CLICK PASSED ---> "+device.getName());
         presenter.connect(device);
+        getActivity().runOnUiThread(() -> Log.d(TAG, "connect: " + device.getIp()));
     }
 
     @Override

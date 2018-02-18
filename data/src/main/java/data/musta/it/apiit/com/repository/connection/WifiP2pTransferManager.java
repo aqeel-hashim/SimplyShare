@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import data.musta.it.apiit.com.R;
@@ -29,7 +30,9 @@ public class WifiP2pTransferManager implements TransferManager {
 
 
     private Context context;
+    private boolean isregistered = false;
     private FileTransferBroadcastReceiver broadcastReceiver;
+    private static final String TAG = WifiP2pTransferManager.class.getSimpleName();
 
     public WifiP2pTransferManager(Context context) {
         this.context = context;
@@ -56,6 +59,7 @@ public class WifiP2pTransferManager implements TransferManager {
             int sub_port = -1;
 
             String ServerBool = SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get(context.getString(R.string.pref_ServerBoolean), "");
+            Log.d(TAG, "send: server bool: " + ServerBool);
             if (!TextUtils.isEmpty(ServerBool) && ServerBool.equalsIgnoreCase("true") && !TextUtils.isEmpty(Ip)) {
                 host = Ip;
                 sub_port = FileTransferService.PORT;
@@ -86,15 +90,17 @@ public class WifiP2pTransferManager implements TransferManager {
 
 
             if (host != null && sub_port != -1) {
-                Toast.makeText(context, "Connecting to host", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, "Connecting to host", Toast.LENGTH_SHORT).show();
                 //context.startService(serviceIntent);
                 context.startService(serviceIntent);
-
-                broadcastReceiver = new FileTransferBroadcastReceiver(listener);
-                IntentFilter intentFilter = new IntentFilter(FileTransferBroadcastReceiver.UPDATE_TRANSFER);
-                intentFilter.addAction(FileTransferBroadcastReceiver.END_TRANSFER);
-                intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
-                context.registerReceiver(broadcastReceiver, intentFilter);
+                if (!isregistered) {
+                    broadcastReceiver = new FileTransferBroadcastReceiver(listener);
+                    IntentFilter intentFilter = new IntentFilter(FileTransferBroadcastReceiver.UPDATE_TRANSFER);
+                    intentFilter.addAction(FileTransferBroadcastReceiver.END_TRANSFER);
+                    intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+                    context.registerReceiver(broadcastReceiver, intentFilter);
+                    isregistered = true;
+                }
 
             } else {
                 Toast.makeText(context, "Host Address not found, Please Re-Connect", Toast.LENGTH_SHORT).show();
@@ -106,6 +112,9 @@ public class WifiP2pTransferManager implements TransferManager {
 
     @Override
     public void unregisterReceivers() {
-        context.unregisterReceiver(broadcastReceiver);
+        if (isregistered) {
+            context.unregisterReceiver(broadcastReceiver);
+            isregistered = false;
+        }
     }
 }

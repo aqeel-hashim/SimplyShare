@@ -14,16 +14,16 @@ import model.musta.it.apiit.com.interactor.TransferProgressListener;
  * Created by Aqeel Hashim on 03-Feb-18.
  */
 
-public class FileTransferBroadcastReceiver extends BroadcastReceiver {
+public class FileReceiverBroadcastReceiver extends BroadcastReceiver {
 
-    public static final String UPDATE_TRANSFER = "data.musta.it.apiit.com.repository.connection.transfer.UPDATE_TRANSFER";
-    public static final String END_TRANSFER = "data.musta.it.apiit.com.repository.connection.transfer.END_TRANSFER";
-    public static final String PROGRESS = "data.musta.it.apiit.com.repository.connection.transfer.PROGRESS";
-    public static final String PROGRESS_ITEM = "data.musta.it.apiit.com.repository.connection.transfer.PROGRESS_ITEM";
+    public static final String UPDATE_TRANSFER = "data.musta.it.apiit.com.repository.connection.transfer.UPDATE_RECEIVE_TRANSFER";
+    public static final String END_TRANSFER = "data.musta.it.apiit.com.repository.connection.transfer.END_RECEIVE_TRANSFER";
+    public static final String PROGRESS = "data.musta.it.apiit.com.repository.connection.transfer.PROGRESS_RECEIVE";
+    public static final String PROGRESS_ITEM = "data.musta.it.apiit.com.repository.connection.transfer.PROGRESS_RECEIVE_ITEM";
 
     private TransferProgressListener listener;
 
-    public FileTransferBroadcastReceiver(TransferProgressListener listener) {
+    public FileReceiverBroadcastReceiver(TransferProgressListener listener) {
         this.listener = listener;
     }
 

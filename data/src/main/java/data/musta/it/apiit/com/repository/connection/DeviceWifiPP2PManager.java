@@ -1,6 +1,7 @@
 package data.musta.it.apiit.com.repository.connection;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
@@ -17,9 +18,11 @@ import java.util.List;
 
 import data.musta.it.apiit.com.R;
 import data.musta.it.apiit.com.entity.DeviceEntity;
+import data.musta.it.apiit.com.repository.connection.transfer.FileReceiverBroadcastReceiver;
 import data.musta.it.apiit.com.repository.connection.transfer.FileServerAsyncTask;
 import data.musta.it.apiit.com.repository.connection.transfer.FileTransferService;
 import data.musta.it.apiit.com.repository.connection.transfer.FirstConnectionMessage;
+import data.musta.it.apiit.com.repository.connection.transfer.FirstPublicKeyMessage;
 import data.musta.it.apiit.com.util.SharedPrefManager;
 import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
@@ -51,6 +54,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
     private static final String TAG = DeviceWifiPP2PManager.class.getSimpleName();
     public static boolean ClientCheck = false;
     private TransferProgressListener listner;
+    private FileReceiverBroadcastReceiver receiverBroadcastReceiver;
 
     public DeviceWifiPP2PManager(Context context, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, TransferProgressListener listner) {
         this.context = context;
@@ -64,6 +68,11 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         intentFilters.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilters.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilters.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+    }
+
+
+    public void setListner(TransferProgressListener listner) {
+        this.listner = listner;
     }
 
     @Override
@@ -88,7 +97,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
 
     @Override
     public void resume() {
-        receiver = new WiFiDirectBroadcastReceiver(manager, mChannel, wifiP2PEnbleListner, connectionListner, this);
+        receiver = new WiFiDirectBroadcastReceiver(manager, mChannel, wifiP2PEnbleListner, connectionListner, this, this);
         context.registerReceiver(receiver, intentFilters);
     }
 
@@ -99,10 +108,11 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
     @Override
     public void pause() {
 
+
         manager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Log.d(TAG, "onSuccess: Stop Peer Discovery");
             }
 
             @Override
@@ -112,6 +122,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         });
         try {
             context.unregisterReceiver(receiver);
+            context.unregisterReceiver(receiverBroadcastReceiver);
         } catch (IllegalArgumentException e) {
             Log.d(TAG, "pause: receiver not registered");
         }
@@ -121,23 +132,10 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
     public void destroy() {
         disconnect();
 
-        manager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                Log.d(TAG, "onFailure: Stop Peer Discovery reason: " + reason);
-            }
-        });
-
-
         manager.clearLocalServices(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Log.d(TAG, "onSuccess: Clear Local Services");
             }
 
             @Override
@@ -149,7 +147,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
         manager.clearServiceRequests(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
-
+                Log.d(TAG, "onSuccess: Clear Service Requests");
             }
 
             @Override
@@ -199,8 +197,17 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
             if (info.groupFormed && info.isGroupOwner) {
 
                 SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).put(context.getString(R.string.pref_ServerBoolean), "true");
-                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner);
+                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner, connectionListner);
                 fileServerAsyncTask.execute();
+
+                FirstPublicKeyMessage firstPublicKeyMessage = new FirstPublicKeyMessage(info, context, currentDevice);
+                firstPublicKeyMessage.execute();
+
+                receiverBroadcastReceiver = new FileReceiverBroadcastReceiver(listner);
+                IntentFilter intentFilter = new IntentFilter(FileReceiverBroadcastReceiver.UPDATE_TRANSFER);
+                intentFilter.addAction(FileReceiverBroadcastReceiver.END_TRANSFER);
+                intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+                context.registerReceiver(receiverBroadcastReceiver, intentFilter);
 
             } else {
                 if (!ClientCheck) {
@@ -209,8 +216,17 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
                     firstConnectionMessage.execute();
                 }
 
-                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner);
+                FileServerAsyncTask fileServerAsyncTask = new FileServerAsyncTask(context, FileTransferService.PORT, listner, connectionListner);
                 fileServerAsyncTask.execute();
+
+                FirstPublicKeyMessage firstPublicKeyMessage = new FirstPublicKeyMessage(info, context, currentDevice);
+                firstPublicKeyMessage.execute();
+
+                receiverBroadcastReceiver = new FileReceiverBroadcastReceiver(listner);
+                IntentFilter intentFilter = new IntentFilter(FileReceiverBroadcastReceiver.UPDATE_TRANSFER);
+                intentFilter.addAction(FileReceiverBroadcastReceiver.END_TRANSFER);
+                intentFilter.addCategory(Intent.CATEGORY_DEFAULT);
+                context.registerReceiver(receiverBroadcastReceiver, intentFilter);
 
             }
 
@@ -230,6 +246,7 @@ public class DeviceWifiPP2PManager implements DeviceManager, OnPeersChangedListn
     public void update(data.musta.it.apiit.com.entity.WifiP2pDevice entity) {
         String ip = getIPAddress(true);
         currentDevice = new DeviceEntity(ip, entity);
+        Log.d(TAG, "update: Current IP is : " + ip);
     }
 
 

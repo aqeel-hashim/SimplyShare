@@ -27,17 +27,17 @@ public class ItemCacheImpl implements ItemCache {
 
     @Override
     public boolean isCached(Item.Type provider) {
-        return !SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get(provider.toString(),"").isEmpty();
+        return !SharedPrefManager.getInstance(context).get(provider.toString(), "").isEmpty();
     }
 
     @Override
     public boolean isExpired() {
-        return SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get("EXPIRATION","").equals("expired");
+        return SharedPrefManager.getInstance(context).get("EXPIRATION", "").equals("expired");
     }
 
     @Override
     public List<ItemEntity> get(Item.Type provider) {
-        String itemEntities = SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).get(provider.toString(),"");
+        String itemEntities = SharedPrefManager.getInstance(context).get(provider.toString(), "");
         Gson gson = new Gson();
         Type type = new TypeToken<List<ItemEntity>>(){}.getType();
         return gson.fromJson(itemEntities, type);
@@ -47,6 +47,6 @@ public class ItemCacheImpl implements ItemCache {
     public void put(Item.Type provider, List<ItemEntity> itemEntities) {
         Gson gson = new Gson();
         String json = gson.toJson(itemEntities);
-        SharedPrefManager.getInstance(context.getSharedPreferences(cacheName, Context.MODE_PRIVATE)).put(provider.toString(),json);
+        SharedPrefManager.getInstance(context).put(provider.toString(), json);
     }
 }

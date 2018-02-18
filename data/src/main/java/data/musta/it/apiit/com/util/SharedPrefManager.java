@@ -1,6 +1,9 @@
 package data.musta.it.apiit.com.util;
 
+import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.securepreferences.SecurePreferences;
 
 /**
  * Created by musta on 28-Dec-17.
@@ -13,13 +16,22 @@ public class SharedPrefManager {
 
     public SharedPrefManager(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
-        this.editor =sharedPreferences.edit();
+        this.editor = sharedPreferences.edit();
+        this.editor.apply();
     }
 
     public static SharedPrefManager getInstance(SharedPreferences sharedPreferences){
         if(sharedPrefManager != null) return sharedPrefManager;
         else {
             sharedPrefManager = new SharedPrefManager(sharedPreferences);
+            return sharedPrefManager;
+        }
+    }
+
+    public static SharedPrefManager getInstance(Context context) {
+        if (sharedPrefManager != null) return sharedPrefManager;
+        else {
+            sharedPrefManager = new SharedPrefManager(new SecurePreferences(context, "SIMPLY_SHARE&aaAA12!@", "simply_share_shared_pref.xml"));
             return sharedPrefManager;
         }
     }

@@ -4,6 +4,9 @@ import com.example.musta.simplyshare.feature.model.DeviceModel;
 
 import java.io.Serializable;
 
+import data.musta.it.apiit.com.repository.connection.DeviceWifiPP2PManager;
+import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
+import model.musta.it.apiit.com.interactor.TransferProgressListener;
 import model.musta.it.apiit.com.model.Device;
 import model.musta.it.apiit.com.model.WifiP2pInfo;
 import model.musta.it.apiit.com.repository.DeviceManager;
@@ -20,8 +23,9 @@ public class DeviceViewPresenter implements Serializable {
         this.deviceManager = deviceManager;
     }
 
-    public void resume(){
+    public void resume(OnPeersChangedListner peersChangedListner) {
         deviceManager.resume();
+        ((DeviceWifiPP2PManager) deviceManager).addOnPeersChangedListner(peersChangedListner);
         deviceManager.discoverPeers();
     }
 
@@ -38,8 +42,12 @@ public class DeviceViewPresenter implements Serializable {
     }
 
     public void connect(DeviceModel deviceModel){
-        Device device = new Device(deviceModel.getId().split("@")[0].trim(), deviceModel.getName(), deviceModel.getId().split("@")[1].trim());
+        Device device = new Device(deviceModel.getIp(), deviceModel.getName(), deviceModel.getMacAddress());
         deviceManager.connect(device);
+    }
+
+    public void setTransferListner(TransferProgressListener listner) {
+        ((DeviceWifiPP2PManager) deviceManager).setListner(listner);
     }
 
     public void connectionHandshake(WifiP2pInfo info) {

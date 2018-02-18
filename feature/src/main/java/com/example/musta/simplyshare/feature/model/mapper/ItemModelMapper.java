@@ -42,7 +42,7 @@ public class ItemModelMapper {
                     try {
                         icon = context.getPackageManager().getApplicationIcon(item.getId());
                     } catch (PackageManager.NameNotFoundException e) {
-                        e.printStackTrace();
+                        //e.printStackTrace();
 
                     }
                     break;

@@ -33,6 +33,7 @@ import model.musta.it.apiit.com.interactor.ConnectionListner;
 import model.musta.it.apiit.com.interactor.OnPeersChangedListner;
 import model.musta.it.apiit.com.interactor.WifiP2PEnbleListner;
 import model.musta.it.apiit.com.model.Device;
+import model.musta.it.apiit.com.repository.DeviceManager;
 
 
 /**
@@ -47,19 +48,23 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver implements Se
     private List<ConnectionListner> listners;
     private CurrentDeviceUpdateListner updateListner;
     private static final String TAG = WiFiDirectBroadcastReceiver.class.getSimpleName();
+    private DeviceManager deviceManager;
+
     /**
      * @param manager WifiP2pManager system service
      * @param channel Wifi p2p channel
      * @param wifiP2PEnbleListner Listener for enabled WiFiP2P
      * @param connectionListner Listener for connectioin changes
      * @param updateListner Listener for WiFi P2P updates e.g PeerList changes
+     * @param deviceManager The Wifi P2P Device Manager used to handle connections and connection requests
      */
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, CurrentDeviceUpdateListner updateListner) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, WifiP2PEnbleListner wifiP2PEnbleListner, ConnectionListner connectionListner, CurrentDeviceUpdateListner updateListner, DeviceManager deviceManager) {
         super();
         this.manager = manager;
         this.channel = channel;
         this.wifiP2PEnbleListner = wifiP2PEnbleListner;
         this.updateListner = updateListner;
+        this.deviceManager = deviceManager;
         this.listners = new ArrayList<>();
         this.listners.add(connectionListner);
         this.onPeersChangedListners = new ArrayList<>();
@@ -132,8 +137,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver implements Se
                 // we are connected with the other device, request connection
                 // info to find group owner IP
                 manager.requestConnectionInfo(channel, info -> {
-                    for (ConnectionListner listner : this.listners)
-                        listner.connected(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));
+                    deviceManager.sendConnectionMessage(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));
+//                    for (ConnectionListner listner : this.listners)
+//                        listner.connected(new model.musta.it.apiit.com.model.WifiP2pInfo(info.groupFormed, info.isGroupOwner, info.groupOwnerAddress));
                 });
             } else {
                 // It's a disconnect
