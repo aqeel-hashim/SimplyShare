@@ -20,9 +20,7 @@ import com.example.musta.simplyshare.feature.model.ItemModel;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 import model.musta.it.apiit.com.model.Item;
 
@@ -59,11 +57,15 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
 
             retriever.release();
             textViedeoTime.setVisibility(View.VISIBLE);
-            DateFormat df = new SimpleDateFormat("HH:mm:ss", Locale.US);
+            DateFormat df = new SimpleDateFormat("hh:mm:ss", context.getResources().getConfiguration().locale);
 
-            Date date = new Date(timeInMillisec);
+            //Date date = new Date(timeInMillisec);
 
-            textViedeoTime.setText(df.format(date));
+            int seconds = (int) (timeInMillisec / 1000) % 60;
+            int minutes = (int) ((timeInMillisec / (1000 * 60)) % 60);
+            int hours = (int) ((timeInMillisec / (1000 * 60 * 60)) % 24);
+
+            textViedeoTime.setText((hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds));
 
         } else if (itemModel.getType() == Item.Type.PICTURE)
             Glide.with(context).load(ThumbnailUtils.extractThumbnail(BitmapFactory.decodeFile(itemModel.getPath()),
