@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.musta.simplyshare.feature">
+
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_NETWORK_STATE"
+        android:required="true" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application android:theme="@style/AppTheme">
+        <activity android:name=".view.activity.MainActivity">
+            <intent-filter android:order="1">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="musta.it.apiit.com"
+                    android:pathPattern="/main"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".view.activity.SplashActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/FullscreenTheme">
+            <intent-filter android:order="1">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="musta.it.apiit.com"
+                    android:pathPattern="/splash"
+                    android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".view.activity.SelectFilesActivity"
+            android:parentActivityName=".view.activity.MainActivity">
+            <intent-filter android:order="1">
+                <action android:name="android.intent.action.VIEW"/>
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="musta.it.apiit.com"
+                    android:pathPattern="/selectfiles"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="data.musta.it.apiit.com.repository.connection.transfer.FileTransferService"
+            android:enabled="true" />
+        <service
+            android:name="data.musta.it.apiit.com.repository.connection.transfer.WiFiClientIPTransferService"
+            android:enabled="true" />
+
+    </application>
+
+</manifest>

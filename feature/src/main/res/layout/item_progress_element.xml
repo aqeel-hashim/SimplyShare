@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+
+    <ProgressBar
+        android:id="@+id/itemProgress"
+        style="@style/CustomProgressBarHorizontal"
+        android:layout_width="match_parent"
+        android:progressTint="@android:color/holo_green_light"
+        android:maxHeight="100dp"
+        android:scaleY="30"
+        android:progress="0"
+        android:layout_height="100dp" />
+
+    <TextView
+        android:id="@+id/itemName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/black"
+        android:text="Test"
+        android:textSize="25sp" />
+
+    <ImageView
+        android:src="@mipmap/ic_music"
+        android:id="@+id/itemImage"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerVertical="true"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp" />
+
+    <TextView
+        android:id="@+id/itemShareSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/itemName"
+        android:layout_toEndOf="@+id/itemImage"
+        android:text="10mb"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/percentageItem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/itemImage"
+        android:layout_alignParentEnd="true"
+        android:text="100%"
+        android:textSize="25sp" />
+
+</RelativeLayout>

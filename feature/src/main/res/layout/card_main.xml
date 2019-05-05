@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_gravity="center_vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2">
+
+            <ImageView
+                android:id="@+id/card_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/simplyshare" />
+
+            <TextView
+                android:id="@+id/videotime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:background="@android:color/darker_gray"
+                android:textColor="@android:color/white"
+                android:text="00:00:00"
+                android:visibility="gone"
+                android:padding="4dp"
+                android:textSize="12sp" />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/card_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="@android:color/black"
+                android:text="abc" />
+
+            <TextView
+                android:id="@+id/card_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="2dp"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@android:color/black"
+                android:text="infoooo" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</android.support.v7.widget.CardView>
